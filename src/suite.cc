@@ -29,6 +29,13 @@ namespace altea {
         });
     }
 
+    void Suite::addBeforeEach(std::function<void (void)> setup)
+    {
+        add([=] {
+            beforeEach.push_back(setup);
+        });
+    }
+
     void Suite::addAfterAll(std::function<void (void)> teardown)
     {
         add([=] {
@@ -68,17 +75,20 @@ namespace altea {
 
     void Suite::run()
     {
-        for (auto s : beforeAll)
-            s();
+        for (auto setup : beforeAll)
+            setup();
 
-        for (auto t : testables) {
-            cout << t->description << endl;
+        for (auto testable : testables) {
+            cout << testable->description << endl;
 
-            t->test();
+            for (auto setup : beforeEach)
+                setup();
+
+            testable->test();
         }
 
-        for (auto d : afterAll)
-            d();
+        for (auto teardown : afterAll)
+            teardown();
     }
 
     void Suite::add(std::function<void(void)> mutator)
@@ -95,7 +105,7 @@ namespace altea {
 
     bool Suite::isLastCall()
     {
-        return beforeAll.size() + afterAll.size() +
+        return beforeAll.size() + beforeEach.size() + afterAll.size() +
             testables.size() >= discovered;
     }
 }

@@ -41,6 +41,8 @@ namespace altea {
 
         void addBeforeAll(std::function<void (void)> setup);
 
+        void addBeforeEach(std::function<void (void)> setup);
+
         void addAfterAll(std::function<void (void)> teardown);
 
         int addSuite(std::string description,
@@ -59,6 +61,8 @@ namespace altea {
         int discovered = 0;
 
         std::vector<std::function<void (void)>> beforeAll;
+
+        std::vector<std::function<void (void)>> beforeEach;
 
         std::vector<std::function<void (void)>> afterAll;
 
@@ -100,6 +104,11 @@ namespace altea {
     inline void beforeAll(std::function<void (void)> setup)
     {
         context.getCurrent()->addBeforeAll(setup);
+    }
+
+    inline void beforeEach(std::function<void (void)> setup)
+    {
+        context.getCurrent()->addBeforeEach(setup);
     }
 
     inline void afterAll(std::function<void (void)> teardown)

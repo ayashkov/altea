@@ -20,6 +20,10 @@ static auto _ = describe("Top-level 1", [] {
         cout << "After All" << endl;
     });
 
+    beforeEach([&] {
+        var += "/";
+    });
+
     it("should run one test", [&] {
         cout << "one" << endl;
     });
