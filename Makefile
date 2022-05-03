@@ -6,6 +6,7 @@ BIN=$(TARGET)/bin
 TEST=$(TARGET)/test
 
 # tools
+RANLIB=ranlib
 MKDIR=mkdir
 RM=rm
 
@@ -22,6 +23,7 @@ test: $(TEST)/altea
 
 $(BIN)/libaltea.a: $(BIN)/altea.o
 	$(AR) -cr $@ $^
+	$(RANLIB) $@
 
 $(TEST)/altea: $(BIN)/libaltea.a $(TEST)/altea-poc1.spec.o $(TEST)/altea-poc2.spec.o
 	$(CXX) -o $@ $+
