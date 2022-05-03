@@ -6,10 +6,18 @@ using namespace std;
 using namespace altea;
 
 static auto _ = describe("Top-level 1", [] {
-    string var = "variable";
+    string var = "";
 
     beforeAll([&] {
-        var += " before all";
+        var = "before all";
+
+        cout << "Before All" << endl;
+    });
+
+    afterAll([&] {
+        var = "";
+
+        cout << "After All" << endl;
     });
 
     it("should run one test", [&] {
