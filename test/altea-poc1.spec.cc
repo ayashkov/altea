@@ -19,6 +19,10 @@ static auto _ = describe("Top-level 1", [] {
         cout << var << endl;
     });
 
+    xit("should nor execute disabled tests", [&] {
+        cout << "DO NOT RUN" << endl;
+    });
+
     describe("Sub context", [&] {
         auto sub = "sub variable";
 
@@ -29,6 +33,12 @@ static auto _ = describe("Top-level 1", [] {
         it("should still have access to variables", [&] {
             cout << var << endl;
             cout << sub << endl;
+        });
+    });
+
+    xdescribe("Disabled context", [&] {
+        it("should not run tests in disabled context", [&] {
+            cout << "DO NOT RUN" << endl;
         });
     });
 });

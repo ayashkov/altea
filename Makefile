@@ -10,6 +10,8 @@ RANLIB=ranlib
 MKDIR=mkdir
 RM=rm
 
+.PHONY: all test clean
+
 $(BIN)/%.o: $(SRC)/%.cc $(BIN)
 	$(CXX) -std=c++17 -I$(SRC) -c -o $@ $<
 
@@ -36,6 +38,5 @@ $(TEST):
 
 $(BIN)/altea.o: $(SRC)/altea.hh
 
-.PHONY: clean
 clean:
 	$(RM) -rf $(TARGET)

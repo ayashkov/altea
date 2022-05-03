@@ -7,7 +7,8 @@ namespace altea {
 
     void Test::test()
     {
-        function();
+        if (function)
+            function();
     }
 
     Suite::~Suite()
@@ -18,7 +19,7 @@ namespace altea {
         testables.clear();
     }
 
-    int Suite::describe(string description, std::function<void (void)> suite)
+    int Suite::addSuite(string description, std::function<void (void)> suite)
     {
         add([=] {
             return new Suite(description, suite);
@@ -27,7 +28,7 @@ namespace altea {
         return 0;
     }
 
-    void Suite::it(string description, std::function<void (void)> test)
+    void Suite::addTest(string description, std::function<void (void)> test)
     {
         add([=] {
             return new Test(description, test);
@@ -36,6 +37,9 @@ namespace altea {
 
     void Suite::test()
     {
+        if (!function)
+            return;
+
         Suite *prev = context.updateCurrent(this);
 
         discovery = true;

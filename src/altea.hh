@@ -49,14 +49,13 @@ namespace altea {
 
         virtual ~Suite();
 
-        int describe(std::string description,
+        int addSuite(std::string description,
             std::function<void (void)> suite);
 
-        void it(std::string description, std::function<void (void)> test);
+        void addTest(std::string description,
+            std::function<void (void)> test);
 
         void test();
-
-        void add(std::function<Testable* (void)> gen);
 
         void run();
 
@@ -66,6 +65,8 @@ namespace altea {
         int discovered = 0;
 
         std::vector<Testable*> testables;
+
+        void add(std::function<Testable* (void)> gen);
 
         void checkAndRun();
     };
@@ -101,13 +102,25 @@ namespace altea {
     inline int describe(std::string description,
         std::function<void (void)> suite)
     {
-        return context.getCurrent()->describe(description, suite);
+        return context.getCurrent()->addSuite(description, suite);
     }
 
     inline void it(std::string description,
         std::function<void (void)> test)
     {
-        context.getCurrent()->it(description, test);
+        context.getCurrent()->addTest(description, test);
+    }
+
+    inline int xdescribe(std::string description,
+        std::function<void (void)> suite)
+    {
+        return context.getCurrent()->addSuite(description, nullptr);
+    }
+
+    inline void xit(std::string description,
+        std::function<void (void)> test)
+    {
+        context.getCurrent()->addTest(description, nullptr);
     }
 }
 
