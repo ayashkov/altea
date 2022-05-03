@@ -1,3 +1,13 @@
+# System, IDE and build
+.idea/
+.settings/
+.vscode/
+target/
+.classpath
+.DS_Store
+.project
+*.iml
+
 # Prerequisites
 *.d
 
