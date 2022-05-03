@@ -24,6 +24,10 @@ static auto _ = describe("Top-level 1", [] {
         var += "/";
     });
 
+    afterEach([&] {
+        var += "\\";
+    });
+
     it("should run one test", [&] {
         cout << "one" << endl;
     });

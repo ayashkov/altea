@@ -45,6 +45,8 @@ namespace altea {
 
         void addAfterAll(std::function<void (void)> teardown);
 
+        void addAfterEach(std::function<void (void)> teardown);
+
         int addSuite(std::string description,
             std::function<void (void)> suite);
 
@@ -66,11 +68,15 @@ namespace altea {
 
         std::vector<std::function<void (void)>> afterAll;
 
+        std::vector<std::function<void (void)>> afterEach;
+
         std::vector<Testable*> testables;
 
         void add(std::function<void(void)> mutator);
 
         bool isLastCall();
+
+        void runOne(Testable *testable);
     };
 
     class Context {
@@ -114,6 +120,11 @@ namespace altea {
     inline void afterAll(std::function<void (void)> teardown)
     {
         context.getCurrent()->addAfterAll(teardown);
+    }
+
+    inline void afterEach(std::function<void (void)> teardown)
+    {
+        context.getCurrent()->addAfterEach(teardown);
     }
 
     inline int describe(std::string description,

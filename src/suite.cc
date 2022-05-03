@@ -7,7 +7,7 @@ using namespace std;
 namespace altea {
     Suite::Suite(): Testable("top", nullptr)
     {
-        discovered = INT_MAX; // open-ended
+        discovered = INT_MAX; // open-ended set of tests
     }
 
     Suite::Suite(string d, std::function<void (void)> s): Testable(d, s)
@@ -40,6 +40,13 @@ namespace altea {
     {
         add([=] {
             afterAll.push_back(teardown);
+        });
+    }
+
+    void Suite::addAfterEach(std::function<void (void)> teardown)
+    {
+        add([=] {
+            afterEach.push_back(teardown);
         });
     }
 
@@ -78,14 +85,8 @@ namespace altea {
         for (auto setup : beforeAll)
             setup();
 
-        for (auto testable : testables) {
-            cout << testable->description << endl;
-
-            for (auto setup : beforeEach)
-                setup();
-
-            testable->test();
-        }
+        for (auto testable : testables)
+            runOne(testable);
 
         for (auto teardown : afterAll)
             teardown();
@@ -106,6 +107,19 @@ namespace altea {
     bool Suite::isLastCall()
     {
         return beforeAll.size() + beforeEach.size() + afterAll.size() +
-            testables.size() >= discovered;
+            afterEach.size() + testables.size() >= discovered;
+    }
+
+    void Suite::runOne(Testable *testable)
+    {
+        cout << testable->description << endl;
+
+        for (auto setup : beforeEach)
+            setup();
+
+        testable->test();
+
+        for (auto teardown : afterEach)
+            teardown();
     }
 }
