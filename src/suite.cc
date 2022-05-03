@@ -22,10 +22,17 @@ namespace altea {
         testables.clear();
     }
 
+    void Suite::addBeforeAll(std::function<void (void)> setup)
+    {
+        add([=] {
+            beforeAll.push_back(setup);
+        });
+    }
+
     int Suite::addSuite(string description, std::function<void (void)> suite)
     {
         add([=] {
-            return new Suite(description, suite);
+            testables.push_back(new Suite(description, suite));
         });
 
         return 0;
@@ -34,7 +41,7 @@ namespace altea {
     void Suite::addTest(string description, std::function<void (void)> test)
     {
         add([=] {
-            return new Test(description, test);
+            testables.push_back(new Test(description, test));
         });
     }
 
@@ -52,29 +59,31 @@ namespace altea {
         context.updateCurrent(prev);
     }
 
-    void Suite::add(std::function<Testable* (void)> gen)
-    {
-        if (discovery)
-            ++discovered;
-        else {
-            testables.push_back(gen());
-            checkAndRun();
-        }
-    }
-
     void Suite::run()
     {
+        for (auto s : beforeAll)
+            s();
+
         for (auto t : testables) {
             cout << t->description << endl;
             t->test();
         }
     }
 
-    void Suite::checkAndRun()
+    void Suite::add(std::function<void(void)> mutator)
     {
-        if (testables.size() < discovered)
-            return;
+        if (discovery)
+            ++discovered;
+        else {
+            mutator();
 
-        run();
+            if (isLastCall())
+                run();
+        }
+    }
+
+    bool Suite::isLastCall()
+    {
+        return beforeAll.size() + testables.size() >= discovered;
     }
 }

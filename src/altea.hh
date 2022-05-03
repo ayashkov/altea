@@ -39,6 +39,8 @@ namespace altea {
 
         virtual ~Suite();
 
+        void addBeforeAll(std::function<void (void)> setup);
+
         int addSuite(std::string description,
             std::function<void (void)> suite);
 
@@ -54,11 +56,13 @@ namespace altea {
 
         int discovered = 0;
 
+        std::vector<std::function<void (void)>> beforeAll;
+
         std::vector<Testable*> testables;
 
-        void add(std::function<Testable* (void)> gen);
+        void add(std::function<void(void)> mutator);
 
-        void checkAndRun();
+        bool isLastCall();
     };
 
     class Context {
@@ -88,6 +92,11 @@ namespace altea {
     };
 
     extern Context context;
+
+    inline void beforeAll(std::function<void (void)> setup)
+    {
+        context.getCurrent()->addBeforeAll(setup);
+    }
 
     inline int describe(std::string description,
         std::function<void (void)> suite)

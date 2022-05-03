@@ -1,11 +1,16 @@
 #include <iostream>
+#include <string>
 #include "altea.hh"
 
 using namespace std;
 using namespace altea;
 
 static auto _ = describe("Top-level 1", [] {
-    auto var = "variable";
+    string var = "variable";
+
+    beforeAll([&] {
+        var += " before all";
+    });
 
     it("should run one test", [&] {
         cout << "one" << endl;
