@@ -23,11 +23,11 @@ all: test
 test: $(TEST)/altea
 	$(TEST)/altea
 
-$(BIN)/libaltea.a: $(BIN)/altea.o
+$(BIN)/libaltea.a: $(BIN)/context.o $(BIN)/suite.o $(BIN)/test.o
 	$(AR) -cr $@ $^
 	$(RANLIB) $@
 
-$(TEST)/altea: $(BIN)/libaltea.a $(TEST)/altea-poc1.spec.o $(TEST)/altea-poc2.spec.o
+$(TEST)/altea: $(BIN)/libaltea.a $(TEST)/spec1.o $(TEST)/spec2.o
 	$(CXX) -o $@ $+
 
 $(BIN):
@@ -36,7 +36,11 @@ $(BIN):
 $(TEST):
 	$(MKDIR) -p $@
 
-$(BIN)/altea.o: $(SRC)/altea.hh
+$(BIN)/context.o: $(SRC)/altea.hh
+
+$(BIN)/suite.o: $(SRC)/altea.hh
+
+$(BIN)/test.o: $(SRC)/altea.hh
 
 clean:
 	$(RM) -rf $(TARGET)

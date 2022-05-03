@@ -4,9 +4,6 @@
 #include <string>
 #include <functional>
 #include <vector>
-#include <exception>
-#include <iostream>
-#include <climits>
 
 namespace altea {
     class Testable {
@@ -29,23 +26,16 @@ namespace altea {
 
     class Test: public Testable {
     public:
-        Test(std::string d, std::function<void (void)> t): Testable(d, t)
-        {
-        }
+        Test(std::string d, std::function<void (void)> t);
 
         void test();
     };
 
     class Suite: public Testable {
     public:
-        Suite(): Testable("top", nullptr)
-        {
-            discovered = INT_MAX;
-        }
+        Suite();
 
-        Suite(std::string d, std::function<void (void)> s): Testable(d, s)
-        {
-        }
+        Suite(std::string d, std::function<void (void)> s);
 
         virtual ~Suite();
 

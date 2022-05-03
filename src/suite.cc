@@ -1,14 +1,17 @@
+#include <climits>
+#include <iostream>
 #include "altea.hh"
 
 using namespace std;
 
 namespace altea {
-    Context context;
-
-    void Test::test()
+    Suite::Suite(): Testable("top", nullptr)
     {
-        if (function)
-            function();
+        discovered = INT_MAX;
+    }
+
+    Suite::Suite(string d, std::function<void (void)> s): Testable(d, s)
+    {
     }
 
     Suite::~Suite()
@@ -74,20 +77,4 @@ namespace altea {
 
         run();
     }
-
-    Context::Context(): top()
-    {
-        current = &top;
-    }
-
-    Context::~Context()
-    {
-    }
-}
-
-int main()
-{
-    altea::context.getCurrent()->run();
-
-    return 0;
 }
