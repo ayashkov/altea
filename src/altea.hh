@@ -8,12 +8,15 @@
 namespace altea {
     class Testable {
     public:
+        const bool focused;
+
         const std::string description;
 
         const std::function<void (void)> function;
 
-        Testable(std::string d, std::function<void (void)> f):
-            description(d), function(f)
+        Testable(bool focused, std::string description,
+            std::function<void (void)> function): focused(focused),
+            description(description), function(function)
         {
         }
 
@@ -26,7 +29,8 @@ namespace altea {
 
     class Test: public Testable {
     public:
-        Test(std::string d, std::function<void (void)> t);
+        Test(bool focused, std::string description,
+            std::function<void (void)> test);
 
         void test();
     };
@@ -35,7 +39,8 @@ namespace altea {
     public:
         Suite();
 
-        Suite(std::string d, std::function<void (void)> s);
+        Suite(bool focused, std::string description,
+            std::function<void (void)> suite);
 
         virtual ~Suite();
 
@@ -50,7 +55,7 @@ namespace altea {
         int addSuite(std::string description,
             std::function<void (void)> suite);
 
-        void addTest(std::string description,
+        void addTest(bool focused, std::string description,
             std::function<void (void)> test);
 
         void test();
@@ -58,6 +63,8 @@ namespace altea {
         void run();
 
     private:
+        bool focusedMode = false;
+
         bool discovery = false;
 
         int discovered = 0;
@@ -133,22 +140,28 @@ namespace altea {
         return context.getCurrent()->addSuite(description, suite);
     }
 
-    inline void it(std::string description,
-        std::function<void (void)> test)
-    {
-        context.getCurrent()->addTest(description, test);
-    }
-
     inline int xdescribe(std::string description,
         std::function<void (void)> suite)
     {
         return context.getCurrent()->addSuite(description, nullptr);
     }
 
+    inline void it(std::string description,
+        std::function<void (void)> test)
+    {
+        context.getCurrent()->addTest(false, description, test);
+    }
+
+    inline void fit(std::string description,
+        std::function<void (void)> test)
+    {
+        context.getCurrent()->addTest(true, description, test);
+    }
+
     inline void xit(std::string description,
         std::function<void (void)> test)
     {
-        context.getCurrent()->addTest(description, nullptr);
+        context.getCurrent()->addTest(false, description, nullptr);
     }
 }
 

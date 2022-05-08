@@ -3,13 +3,14 @@
 using namespace std;
 
 namespace altea {
-    Test::Test(string d, std::function<void (void)> t): Testable(d, t)
+    Test::Test(bool focused, string description,
+        std::function<void (void)> test): Testable(focused, description,
+        test)
     {
     }
 
     void Test::test()
     {
-        if (function)
-            function();
+        function();
     }
 }

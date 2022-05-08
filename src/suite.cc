@@ -5,12 +5,14 @@
 using namespace std;
 
 namespace altea {
-    Suite::Suite(): Testable("top", nullptr)
+    Suite::Suite(): Testable(false, "root", nullptr)
     {
         discovered = INT_MAX; // open-ended set of tests
     }
 
-    Suite::Suite(string d, std::function<void (void)> s): Testable(d, s)
+    Suite::Suite(bool focused, string description,
+        std::function<void (void)> suite): Testable(focused, description,
+        suite)
     {
     }
 
@@ -53,24 +55,25 @@ namespace altea {
     int Suite::addSuite(string description, std::function<void (void)> suite)
     {
         add([=] {
-            testables.push_back(new Suite(description, suite));
+            testables.push_back(new Suite(false, description, suite));
         });
 
         return 0;
     }
 
-    void Suite::addTest(string description, std::function<void (void)> test)
+    void Suite::addTest(bool focused, string description,
+        std::function<void (void)> test)
     {
+        if (focused)
+            focusedMode = true;
+
         add([=] {
-            testables.push_back(new Test(description, test));
+            testables.push_back(new Test(focused, description, test));
         });
     }
 
     void Suite::test()
     {
-        if (!function)
-            return;
-
         Suite *prev = context.updateCurrent(this);
 
         discovery = true;
@@ -112,6 +115,9 @@ namespace altea {
 
     void Suite::runOne(Testable *testable)
     {
+        if (!testable->function || (focusedMode && !testable->focused))
+            return;
+
         cout << testable->description << endl;
 
         for (auto setup : beforeEach)
