@@ -52,19 +52,18 @@ namespace altea {
         std::function<void (void)> suite)
     {
         if (context.isDiscovery()) {
-            ++discovered;
-
-            if (mode == FOCUSED) {
-                focusedMode = true;
-                this->mode = FOCUSED;
-            }
-
             auto sub = new Suite(mode, description, suite);
             auto prev = context.updateCurrent(sub);
 
             suite();
             context.updateCurrent(prev);
             subSuites.push(sub);
+            ++discovered;
+
+            if (sub->mode == FOCUSED) {
+                focusedMode = true;
+                this->mode = FOCUSED;
+            }
        } else {
             auto sub = subSuites.front()->with(suite);
 
@@ -80,12 +79,19 @@ namespace altea {
     void Suite::addTest(Mode mode, string description,
         std::function<void (void)> test)
     {
-        add([=] {
-            if (mode == FOCUSED)
-                focusedMode = true;
+        if (context.isDiscovery()) {
+            ++discovered;
 
+            if (mode == FOCUSED) {
+                focusedMode = true;
+                this->mode = FOCUSED;
+            }
+        } else {
             testables.push_back(new Test(mode, description, test));
-        });
+
+            if (isLastCall())
+                run();
+        }
     }
 
     void Suite::test()

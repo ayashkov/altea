@@ -9,7 +9,7 @@ static auto _ = describe("Top-level 2", [] {
         cout << "DO NOT RUN" << endl;
     });
 
-    fit("should run when focused", [&] {
+    it("should run when focused", [&] {
         cout << "under top level 2" << endl;
     });
 
