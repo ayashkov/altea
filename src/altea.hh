@@ -3,20 +3,19 @@
 
 #include <string>
 #include <functional>
+#include <queue>
 #include <vector>
 
 namespace altea {
+    enum Mode { NORMAL, FOCUSED, EXCLUDED };
+
     class Testable {
     public:
-        const bool focused;
-
         const std::string description;
 
-        const std::function<void (void)> function;
-
-        Testable(bool focused, std::string description,
-            std::function<void (void)> function): focused(focused),
-            description(description), function(function)
+        Testable(Mode mode, std::string description,
+            std::function<void (void)> testable): mode(mode),
+            description(description), testable(testable)
         {
         }
 
@@ -24,12 +23,21 @@ namespace altea {
         {
         }
 
+        inline bool skipped(bool focusedMode)
+        {
+            return mode == EXCLUDED || (focusedMode && mode != FOCUSED);
+        }
+
         virtual void test() = 0;
+    protected:
+        Mode mode;
+
+        std::function<void (void)> testable;
     };
 
     class Test: public Testable {
     public:
-        Test(bool focused, std::string description,
+        Test(Mode mode, std::string description,
             std::function<void (void)> test);
 
         void test();
@@ -37,12 +45,17 @@ namespace altea {
 
     class Suite: public Testable {
     public:
-        Suite();
-
-        Suite(bool focused, std::string description,
+        Suite(Mode mode, std::string description,
             std::function<void (void)> suite);
 
         virtual ~Suite();
+
+        inline Suite *with(std::function<void (void)> suite)
+        {
+            testable = suite;
+
+            return this;
+        }
 
         void addBeforeAll(std::function<void (void)> setup);
 
@@ -52,22 +65,22 @@ namespace altea {
 
         void addAfterEach(std::function<void (void)> teardown);
 
-        int addSuite(bool focused, std::string description,
+        void addSuite(Mode mode, std::string description,
             std::function<void (void)> suite);
 
-        void addTest(bool focused, std::string description,
+        void addTest(Mode mode, std::string description,
             std::function<void (void)> test);
 
         void test();
 
-        void run();
+        void rootRun();
 
     private:
         bool focusedMode = false;
 
-        bool discovery = false;
-
         int discovered = 0;
+
+        std::queue<Suite*> subSuites;
 
         std::vector<std::function<void (void)>> beforeAll;
 
@@ -82,6 +95,8 @@ namespace altea {
         void add(std::function<void(void)> mutator);
 
         bool isLastCall();
+
+        void run();
 
         void runOne(Testable *testable);
     };
@@ -106,10 +121,19 @@ namespace altea {
             return prev;
         }
 
+        inline bool isDiscovery()
+        {
+            return discovery;
+        }
+
+        void run();
+
     private:
-        Suite top;
+        Suite root;
 
         Suite *current;
+
+        bool discovery = true;
     };
 
     extern Context context;
@@ -137,37 +161,43 @@ namespace altea {
     inline int describe(std::string description,
         std::function<void (void)> suite)
     {
-        return context.getCurrent()->addSuite(false, description, suite);
+        context.getCurrent()->addSuite(NORMAL, description, suite);
+
+        return 0;
     }
 
     inline int fdescribe(std::string description,
         std::function<void (void)> suite)
     {
-        return context.getCurrent()->addSuite(true, description, suite);
+        context.getCurrent()->addSuite(FOCUSED, description, suite);
+
+        return 0;
     }
 
     inline int xdescribe(std::string description,
         std::function<void (void)> suite)
     {
-        return context.getCurrent()->addSuite(false, description, nullptr);
+        context.getCurrent()->addSuite(EXCLUDED, description, suite);
+
+        return 0;
     }
 
     inline void it(std::string description,
         std::function<void (void)> test)
     {
-        context.getCurrent()->addTest(false, description, test);
+        context.getCurrent()->addTest(NORMAL, description, test);
     }
 
     inline void fit(std::string description,
         std::function<void (void)> test)
     {
-        context.getCurrent()->addTest(true, description, test);
+        context.getCurrent()->addTest(FOCUSED, description, test);
     }
 
     inline void xit(std::string description,
         std::function<void (void)> test)
     {
-        context.getCurrent()->addTest(false, description, nullptr);
+        context.getCurrent()->addTest(EXCLUDED, description, test);
     }
 }
 

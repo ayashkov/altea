@@ -5,19 +5,25 @@ using namespace altea;
 namespace altea {
     Context context;
 
-    Context::Context(): top()
+    Context::Context(): root(NORMAL, "root", nullptr)
     {
-        current = &top;
+        current = &root;
     }
 
     Context::~Context()
     {
     }
+
+    void Context::run()
+    {
+        discovery = false;
+        root.rootRun();
+    }
 }
 
 int main()
 {
-    context.getCurrent()->run();
+    context.run();
 
     return 0;
 }

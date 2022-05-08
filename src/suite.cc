@@ -1,17 +1,13 @@
 #include <climits>
 #include <iostream>
+#include <cassert>
 #include "altea.hh"
 
 using namespace std;
 
 namespace altea {
-    Suite::Suite(): Testable(false, "root", nullptr)
-    {
-        discovered = INT_MAX; // open-ended set of tests
-    }
-
-    Suite::Suite(bool focused, string description,
-        std::function<void (void)> suite): Testable(focused, description,
+    Suite::Suite(Mode mode, string description,
+        std::function<void (void)> suite): Testable(mode, description,
         suite)
     {
     }
@@ -52,56 +48,67 @@ namespace altea {
         });
     }
 
-    int Suite::addSuite(bool focused, string description,
+    void Suite::addSuite(Mode mode, string description,
         std::function<void (void)> suite)
     {
-        if (focused)
-            focusedMode = true;
+        if (context.isDiscovery()) {
+            ++discovered;
 
-        add([=] {
-            testables.push_back(new Suite(focused, description, suite));
-        });
+            if (mode == FOCUSED) {
+                focusedMode = true;
+                this->mode = FOCUSED;
+            }
 
-        return 0;
+            auto sub = new Suite(mode, description, suite);
+            auto prev = context.updateCurrent(sub);
+
+            suite();
+            context.updateCurrent(prev);
+            subSuites.push(sub);
+       } else {
+            auto sub = subSuites.front()->with(suite);
+
+            subSuites.pop();
+            assert(sub->description == description);
+            testables.push_back(sub);
+
+            if (isLastCall())
+                run();
+        }
     }
 
-    void Suite::addTest(bool focused, string description,
+    void Suite::addTest(Mode mode, string description,
         std::function<void (void)> test)
     {
-        if (focused)
-            focusedMode = true;
-
         add([=] {
-            testables.push_back(new Test(focused, description, test));
+            if (mode == FOCUSED)
+                focusedMode = true;
+
+            testables.push_back(new Test(mode, description, test));
         });
     }
 
     void Suite::test()
     {
-        Suite *prev = context.updateCurrent(this);
+        auto prev = context.updateCurrent(this);
 
-        discovery = true;
-        function();
-        discovery = false;
-        function();
+        testable();
         context.updateCurrent(prev);
     }
 
-    void Suite::run()
+    void Suite::rootRun()
     {
-        for (auto setup : beforeAll)
-            setup();
+        while (!subSuites.empty()) {
+            auto sub = subSuites.front();
 
-        for (auto testable : testables)
-            runOne(testable);
-
-        for (auto teardown : afterAll)
-            teardown();
+            subSuites.pop();
+            runOne(sub);
+        }
     }
 
     void Suite::add(std::function<void(void)> mutator)
     {
-        if (discovery)
+        if (context.isDiscovery())
             ++discovered;
         else {
             mutator();
@@ -117,9 +124,21 @@ namespace altea {
             afterEach.size() + testables.size() >= discovered;
     }
 
+    void Suite::run()
+    {
+        for (auto setup : beforeAll)
+            setup();
+
+        for (auto testable : testables)
+            runOne(testable);
+
+        for (auto teardown : afterAll)
+            teardown();
+    }
+
     void Suite::runOne(Testable *testable)
     {
-        if (!testable->function || (focusedMode && !testable->focused))
+        if (testable->skipped(focusedMode))
             return;
 
         cout << testable->description << endl;
