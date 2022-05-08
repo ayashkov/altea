@@ -52,7 +52,7 @@ namespace altea {
 
         void addAfterEach(std::function<void (void)> teardown);
 
-        int addSuite(std::string description,
+        int addSuite(bool focused, std::string description,
             std::function<void (void)> suite);
 
         void addTest(bool focused, std::string description,
@@ -137,13 +137,19 @@ namespace altea {
     inline int describe(std::string description,
         std::function<void (void)> suite)
     {
-        return context.getCurrent()->addSuite(description, suite);
+        return context.getCurrent()->addSuite(false, description, suite);
+    }
+
+    inline int fdescribe(std::string description,
+        std::function<void (void)> suite)
+    {
+        return context.getCurrent()->addSuite(true, description, suite);
     }
 
     inline int xdescribe(std::string description,
         std::function<void (void)> suite)
     {
-        return context.getCurrent()->addSuite(description, nullptr);
+        return context.getCurrent()->addSuite(false, description, nullptr);
     }
 
     inline void it(std::string description,

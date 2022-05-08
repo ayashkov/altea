@@ -52,10 +52,14 @@ namespace altea {
         });
     }
 
-    int Suite::addSuite(string description, std::function<void (void)> suite)
+    int Suite::addSuite(bool focused, string description,
+        std::function<void (void)> suite)
     {
+        if (focused)
+            focusedMode = true;
+
         add([=] {
-            testables.push_back(new Suite(false, description, suite));
+            testables.push_back(new Suite(focused, description, suite));
         });
 
         return 0;
