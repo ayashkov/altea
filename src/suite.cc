@@ -1,6 +1,5 @@
 #include <climits>
 #include <iostream>
-#include <cassert>
 #include "altea.hh"
 
 using namespace std;
@@ -58,17 +57,12 @@ namespace altea {
             suite();
             context.updateCurrent(prev);
             subSuites.push(sub);
+            adjustMode(sub->mode);
             ++discovered;
-
-            if (sub->mode == FOCUSED) {
-                focusedMode = true;
-                this->mode = FOCUSED;
-            }
-       } else {
+        } else {
             auto sub = subSuites.front()->with(suite);
 
             subSuites.pop();
-            assert(sub->description == description);
             testables.push_back(sub);
 
             if (isLastCall())
@@ -80,12 +74,8 @@ namespace altea {
         std::function<void (void)> test)
     {
         if (context.isDiscovery()) {
+            adjustMode(mode);
             ++discovered;
-
-            if (mode == FOCUSED) {
-                focusedMode = true;
-                this->mode = FOCUSED;
-            }
         } else {
             testables.push_back(new Test(mode, description, test));
 
@@ -96,10 +86,12 @@ namespace altea {
 
     void Suite::test()
     {
-        auto prev = context.updateCurrent(this);
+        if (testable) {
+            auto prev = context.updateCurrent(this);
 
-        testable();
-        context.updateCurrent(prev);
+            testable();
+            context.updateCurrent(prev);
+        }
     }
 
     void Suite::rootRun()
@@ -109,6 +101,14 @@ namespace altea {
 
             subSuites.pop();
             runOne(sub);
+        }
+    }
+
+    void Suite::adjustMode(Mode mode)
+    {
+        if (mode == FOCUSED) {
+            focusedMode = true;
+            this->mode = FOCUSED;
         }
     }
 

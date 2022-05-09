@@ -51,7 +51,7 @@ static auto _ = describe("Top-level 1", [] {
             cout << "sub" << endl;
         });
 
-        fit("should still have access to variables", [&] {
+        it("should still have access to variables", [&] {
             cout << var << endl;
             cout << sub << endl;
         });

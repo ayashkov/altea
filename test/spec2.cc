@@ -13,7 +13,7 @@ static auto _ = describe("Top-level 2", [] {
         cout << "under top level 2" << endl;
     });
 
-    fdescribe("focused suite", [&] {
+    describe("focused suite", [&] {
         it("should run under a focused suite", [&] {
             cout << "under sub level 2" << endl;
         });

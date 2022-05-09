@@ -40,7 +40,7 @@ namespace altea {
         Test(Mode mode, std::string description,
             std::function<void (void)> test);
 
-        void test();
+        virtual void test();
     };
 
     class Suite: public Testable {
@@ -71,7 +71,7 @@ namespace altea {
         void addTest(Mode mode, std::string description,
             std::function<void (void)> test);
 
-        void test();
+        virtual void test();
 
         void rootRun();
 
@@ -91,6 +91,8 @@ namespace altea {
         std::vector<std::function<void (void)>> afterEach;
 
         std::vector<Testable*> testables;
+
+        void adjustMode(Mode mode);
 
         void add(std::function<void(void)> mutator);
 
