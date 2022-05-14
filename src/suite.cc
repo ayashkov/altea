@@ -84,14 +84,9 @@ namespace altea {
         }
     }
 
-    void Suite::test()
+    Matcher Suite::expect()
     {
-        if (testable) {
-            auto prev = context.updateCurrent(this);
-
-            testable();
-            context.updateCurrent(prev);
-        }
+        throw SyntaxException("a suite cannot contain expect()");
     }
 
     void Suite::rootRun()
@@ -147,6 +142,8 @@ namespace altea {
         if (testable->skipped(focusedMode))
             return;
 
+        auto prev = context.updateCurrent(testable);
+
         cout << testable->description << endl;
 
         for (auto setup : beforeEach)
@@ -156,5 +153,8 @@ namespace altea {
 
         for (auto teardown : afterEach)
             teardown();
+
+        testable->evaluate();
+        context.updateCurrent(prev);
     }
 }

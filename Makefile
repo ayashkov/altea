@@ -23,7 +23,8 @@ all: test
 test: $(TEST)/altea
 	$(TEST)/altea
 
-$(BIN)/libaltea.a: $(BIN)/context.o $(BIN)/suite.o $(BIN)/test.o
+$(BIN)/libaltea.a: $(BIN)/context.o $(BIN)/testable.o $(BIN)/suite.o \
+	$(BIN)/test.o $(BIN)/matchers.o
 	$(AR) -cr $@ $^
 	$(RANLIB) $@
 
@@ -38,9 +39,13 @@ $(TEST):
 
 $(BIN)/context.o: $(SRC)/altea.hh
 
+$(BIN)/testable.o: $(SRC)/altea.hh
+
 $(BIN)/suite.o: $(SRC)/altea.hh
 
 $(BIN)/test.o: $(SRC)/altea.hh
+
+$(BIN)/matchers.o: $(SRC)/altea.hh
 
 clean:
 	$(RM) -rf $(TARGET)

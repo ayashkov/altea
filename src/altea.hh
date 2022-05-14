@@ -5,34 +5,71 @@
 #include <functional>
 #include <queue>
 #include <vector>
+#include <exception>
 
 namespace altea {
     enum Mode { NORMAL, FOCUSED, EXCLUDED };
+
+    class TestException: public std::runtime_error {
+    public:
+        TestException(const char *what): std::runtime_error(what)
+        {
+        }
+    };
+
+    class SyntaxException: public TestException {
+    public:
+        SyntaxException(const char *what): TestException(what)
+        {
+        }
+    };
+
+    class Matcher {
+    public:
+        void nothing();
+    };
 
     class Testable {
     public:
         const std::string description;
 
         Testable(Mode mode, std::string description,
-            std::function<void (void)> testable): mode(mode),
-            description(description), testable(testable)
-        {
-        }
+            std::function<void (void)> testable);
 
         virtual ~Testable()
         {
         }
 
-        inline bool skipped(bool focusedMode)
-        {
-            return mode == EXCLUDED || (focusedMode && mode != FOCUSED);
-        }
+        bool skipped(bool focusedMode);
 
-        virtual void test() = 0;
+        void test();
+
+        void recordExpect();
+
+        virtual void addBeforeAll(std::function<void (void)> setup) = 0;
+
+        virtual void addBeforeEach(std::function<void (void)> setup) = 0;
+
+        virtual void addAfterAll(std::function<void (void)> teardown) = 0;
+
+        virtual void addAfterEach(std::function<void (void)> teardown) = 0;
+
+        virtual void addSuite(Mode mode, std::string description,
+            std::function<void (void)> suite) = 0;
+
+        virtual void addTest(Mode mode, std::string description,
+            std::function<void (void)> test) = 0;
+
+        virtual Matcher expect() = 0;
+
+        virtual void evaluate();
+
     protected:
         Mode mode;
 
         std::function<void (void)> testable;
+
+        int expectCount = 0;
     };
 
     class Test: public Testable {
@@ -40,7 +77,23 @@ namespace altea {
         Test(Mode mode, std::string description,
             std::function<void (void)> test);
 
-        virtual void test();
+        virtual void addBeforeAll(std::function<void (void)> setup);
+
+        virtual void addBeforeEach(std::function<void (void)> setup);
+
+        virtual void addAfterAll(std::function<void (void)> teardown);
+
+        virtual void addAfterEach(std::function<void (void)> teardown);
+
+        virtual void addSuite(Mode mode, std::string description,
+            std::function<void (void)> suite);
+
+        virtual void addTest(Mode mode, std::string description,
+            std::function<void (void)> test);
+
+        virtual Matcher expect();
+
+        virtual void evaluate();
     };
 
     class Suite: public Testable {
@@ -57,21 +110,21 @@ namespace altea {
             return this;
         }
 
-        void addBeforeAll(std::function<void (void)> setup);
+        virtual void addBeforeAll(std::function<void (void)> setup);
 
-        void addBeforeEach(std::function<void (void)> setup);
+        virtual void addBeforeEach(std::function<void (void)> setup);
 
-        void addAfterAll(std::function<void (void)> teardown);
+        virtual void addAfterAll(std::function<void (void)> teardown);
 
-        void addAfterEach(std::function<void (void)> teardown);
+        virtual void addAfterEach(std::function<void (void)> teardown);
 
-        void addSuite(Mode mode, std::string description,
+        virtual void addSuite(Mode mode, std::string description,
             std::function<void (void)> suite);
 
-        void addTest(Mode mode, std::string description,
+        virtual void addTest(Mode mode, std::string description,
             std::function<void (void)> test);
 
-        virtual void test();
+        virtual Matcher expect();
 
         void rootRun();
 
@@ -109,14 +162,14 @@ namespace altea {
 
         ~Context();
 
-        inline Suite *getCurrent()
+        inline Testable *getCurrent()
         {
             return current;
         }
 
-        inline Suite *updateCurrent(Suite *next)
+        inline Testable *updateCurrent(Testable *next)
         {
-            Suite *prev = current;
+            auto prev = current;
 
             current = next;
 
@@ -133,7 +186,7 @@ namespace altea {
     private:
         Suite root;
 
-        Suite *current;
+        Testable *current;
 
         bool discovery = true;
     };
@@ -200,6 +253,11 @@ namespace altea {
         std::function<void (void)> test)
     {
         context.getCurrent()->addTest(EXCLUDED, description, test);
+    }
+
+    inline Matcher expect()
+    {
+        return context.getCurrent()->expect();
     }
 }
 

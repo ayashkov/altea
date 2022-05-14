@@ -1,5 +1,7 @@
+#include <iostream>
 #include "altea.hh"
 
+using namespace std;
 using namespace altea;
 
 namespace altea {
@@ -23,7 +25,17 @@ namespace altea {
 
 int main()
 {
-    context.run();
+    try {
+        context.run();
 
-    return 0;
+        return 0;
+    } catch (const SyntaxException &ex) {
+        cerr << "Syntax error: " << ex.what() << endl;
+    } catch (const exception &ex) {
+        cerr << "Runtime error: " << ex.what() << endl;
+    } catch (...) {
+        cerr << "Caught unhandled exception" << endl;
+    }
+
+    return 1;
 }
