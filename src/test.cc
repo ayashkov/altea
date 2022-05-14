@@ -44,9 +44,9 @@ namespace altea {
             "xit()");
     }
 
-    Matcher Test::expect()
+    Matcher Test::doExpect(const string &file, int line)
     {
-        return Matcher();
+        return Matcher(file, line);
     }
 
     void Test::evaluate()

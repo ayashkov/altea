@@ -26,9 +26,15 @@ namespace altea {
 
     class Matcher {
     public:
+        Matcher(const std::string &file, int line);
+
         void nothing();
 
-        void fail(const std::string &description);
+        void toFail(const std::string &description);
+    private:
+        std::string file;
+
+        int line;
     };
 
     class Testable {
@@ -48,7 +54,8 @@ namespace altea {
 
         void recordExpect();
 
-        void recordFailure(const std::string &message);
+        void recordFailure(const std::string &file, int line,
+            const std::string &message);
 
         virtual void addBeforeAll(std::function<void (void)> setup) = 0;
 
@@ -64,7 +71,7 @@ namespace altea {
         virtual void addTest(Mode mode, std::string description,
             std::function<void (void)> test) = 0;
 
-        virtual Matcher expect() = 0;
+        virtual Matcher doExpect(const std::string &file, int line) = 0;
 
         virtual void evaluate();
 
@@ -97,7 +104,7 @@ namespace altea {
         virtual void addTest(Mode mode, std::string description,
             std::function<void (void)> test);
 
-        virtual Matcher expect();
+        virtual Matcher doExpect(const std::string &file, int line);
 
         virtual void evaluate();
     };
@@ -130,7 +137,7 @@ namespace altea {
         virtual void addTest(Mode mode, std::string description,
             std::function<void (void)> test);
 
-        virtual Matcher expect();
+        virtual Matcher doExpect(const std::string &file, int line);
 
         void rootRun();
 
@@ -196,7 +203,8 @@ namespace altea {
 
         void recordExpect();
 
-        void recordFailure(const std::string &message);
+        void recordFailure(const std::string &file, int line,
+            const std::string &message);
 
     private:
         Suite root;
@@ -271,16 +279,9 @@ namespace altea {
     {
         context.getCurrent()->addTest(EXCLUDED, description, test);
     }
-
-    inline Matcher expect()
-    {
-        return context.getCurrent()->expect();
-    }
-
-    inline void fail(const std::string &message)
-    {
-        context.getCurrent()->expect().fail(message);
-    }
 }
+
+#define expect() (context.getCurrent()->doExpect(__FILE__, __LINE__))
+#define fail(message) (context.getCurrent()->doExpect(__FILE__, __LINE__).toFail(message))
 
 #endif // __ALTEA_HH

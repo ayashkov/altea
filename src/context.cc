@@ -27,10 +27,11 @@ namespace altea {
         current->recordExpect();
     }
 
-    void Context::recordFailure(const std::string &message)
+    void Context::recordFailure(const string &file, int line,
+        const string &message)
     {
         failed = true;
-        current->recordFailure(message);
+        current->recordFailure(file, line, message);
     }
 }
 

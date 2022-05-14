@@ -26,9 +26,11 @@ namespace altea {
         ++expectCount;
     }
 
-    void Testable::recordFailure(const std::string &message)
+    void Testable::recordFailure(const string &file, int line,
+        const string &message)
     {
-        failures.push_back(message);
+        failures.push_back(file + ":" + to_string(line) +": " +
+            message);
     }
 
     void Testable::evaluate()
