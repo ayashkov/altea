@@ -4,7 +4,7 @@
 using namespace std;
 
 namespace altea {
-    Test::Test(Mode mode, string description,
+    Test::Test(Mode mode, const string &description,
         std::function<void (void)> test): Testable(mode, description,
         test)
     {
@@ -51,6 +51,8 @@ namespace altea {
 
     void Test::evaluate()
     {
+        Testable::evaluate();
+
         if (expectCount == 0)
             cout << "WARNING: test case '" << description <<
                 "' defines no expectations" << endl;

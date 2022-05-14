@@ -21,6 +21,17 @@ namespace altea {
         discovery = false;
         root.rootRun();
     }
+
+    void Context::recordExpect()
+    {
+        current->recordExpect();
+    }
+
+    void Context::recordFailure(const std::string &message)
+    {
+        failed = true;
+        current->recordFailure(message);
+    }
 }
 
 int main()
@@ -28,7 +39,7 @@ int main()
     try {
         context.run();
 
-        return 0;
+        return context.isFailed() ? 1 : 0;
     } catch (const SyntaxException &ex) {
         cerr << "Syntax error: " << ex.what() << endl;
     } catch (const exception &ex) {
@@ -37,5 +48,5 @@ int main()
         cerr << "Caught unhandled exception" << endl;
     }
 
-    return 1;
+    return 2;
 }

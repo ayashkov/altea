@@ -39,7 +39,7 @@ static auto _ = describe("Top-level 1", [] {
     });
 
     xit("should nor execute disabled tests", [&] {
-        expect().nothing();
+        fail("must not run");
     });
 
     describe("Sub context", [&] {
@@ -59,7 +59,7 @@ static auto _ = describe("Top-level 1", [] {
 
     xdescribe("Disabled context", [&] {
         it("should not run tests in disabled context", [&] {
-            expect().nothing();
+            expect().fail("must not run");
         });
     });
 });

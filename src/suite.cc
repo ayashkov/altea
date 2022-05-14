@@ -5,7 +5,7 @@
 using namespace std;
 
 namespace altea {
-    Suite::Suite(Mode mode, string description,
+    Suite::Suite(Mode mode, const string &description,
         std::function<void (void)> suite): Testable(mode, description,
         suite)
     {

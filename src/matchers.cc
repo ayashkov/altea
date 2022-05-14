@@ -5,6 +5,11 @@ using namespace std;
 namespace altea {
     void Matcher::nothing()
     {
-        context.getCurrent()->recordExpect();
+        context.recordExpect();
+    }
+
+    void Matcher::fail(const std::string &message)
+    {
+        context.recordFailure(message);
     }
 }

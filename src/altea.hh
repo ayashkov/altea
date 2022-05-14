@@ -12,14 +12,14 @@ namespace altea {
 
     class TestException: public std::runtime_error {
     public:
-        TestException(const char *what): std::runtime_error(what)
+        TestException(const std::string &what): std::runtime_error(what)
         {
         }
     };
 
     class SyntaxException: public TestException {
     public:
-        SyntaxException(const char *what): TestException(what)
+        SyntaxException(const std::string &what): TestException(what)
         {
         }
     };
@@ -27,13 +27,15 @@ namespace altea {
     class Matcher {
     public:
         void nothing();
+
+        void fail(const std::string &description);
     };
 
     class Testable {
     public:
         const std::string description;
 
-        Testable(Mode mode, std::string description,
+        Testable(Mode mode, const std::string &description,
             std::function<void (void)> testable);
 
         virtual ~Testable()
@@ -45,6 +47,8 @@ namespace altea {
         void test();
 
         void recordExpect();
+
+        void recordFailure(const std::string &message);
 
         virtual void addBeforeAll(std::function<void (void)> setup) = 0;
 
@@ -70,11 +74,13 @@ namespace altea {
         std::function<void (void)> testable;
 
         int expectCount = 0;
+
+        std::vector<std::string> failures;
     };
 
     class Test: public Testable {
     public:
-        Test(Mode mode, std::string description,
+        Test(Mode mode, const std::string &description,
             std::function<void (void)> test);
 
         virtual void addBeforeAll(std::function<void (void)> setup);
@@ -98,7 +104,7 @@ namespace altea {
 
     class Suite: public Testable {
     public:
-        Suite(Mode mode, std::string description,
+        Suite(Mode mode, const std::string &description,
             std::function<void (void)> suite);
 
         virtual ~Suite();
@@ -181,7 +187,16 @@ namespace altea {
             return discovery;
         }
 
+        inline bool isFailed()
+        {
+            return failed;
+        }
+
         void run();
+
+        void recordExpect();
+
+        void recordFailure(const std::string &message);
 
     private:
         Suite root;
@@ -189,6 +204,8 @@ namespace altea {
         Testable *current;
 
         bool discovery = true;
+
+        bool failed = false;
     };
 
     extern Context context;
@@ -213,7 +230,7 @@ namespace altea {
         context.getCurrent()->addAfterEach(teardown);
     }
 
-    inline int describe(std::string description,
+    inline int describe(const std::string &description,
         std::function<void (void)> suite)
     {
         context.getCurrent()->addSuite(NORMAL, description, suite);
@@ -221,7 +238,7 @@ namespace altea {
         return 0;
     }
 
-    inline int fdescribe(std::string description,
+    inline int fdescribe(const std::string &description,
         std::function<void (void)> suite)
     {
         context.getCurrent()->addSuite(FOCUSED, description, suite);
@@ -229,7 +246,7 @@ namespace altea {
         return 0;
     }
 
-    inline int xdescribe(std::string description,
+    inline int xdescribe(const std::string &description,
         std::function<void (void)> suite)
     {
         context.getCurrent()->addSuite(EXCLUDED, description, suite);
@@ -237,19 +254,19 @@ namespace altea {
         return 0;
     }
 
-    inline void it(std::string description,
+    inline void it(const std::string &description,
         std::function<void (void)> test)
     {
         context.getCurrent()->addTest(NORMAL, description, test);
     }
 
-    inline void fit(std::string description,
+    inline void fit(const std::string &description,
         std::function<void (void)> test)
     {
         context.getCurrent()->addTest(FOCUSED, description, test);
     }
 
-    inline void xit(std::string description,
+    inline void xit(const std::string &description,
         std::function<void (void)> test)
     {
         context.getCurrent()->addTest(EXCLUDED, description, test);
@@ -258,6 +275,11 @@ namespace altea {
     inline Matcher expect()
     {
         return context.getCurrent()->expect();
+    }
+
+    inline void fail(const std::string &message)
+    {
+        context.getCurrent()->expect().fail(message);
     }
 }
 

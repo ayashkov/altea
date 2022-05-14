@@ -1,9 +1,10 @@
+#include <iostream>
 #include "altea.hh"
 
 using namespace std;
 
 namespace altea {
-    Testable::Testable(Mode mode, std::string description,
+    Testable::Testable(Mode mode, const std::string &description,
         std::function<void (void)> testable): mode(mode),
         description(description), testable(testable)
     {
@@ -25,7 +26,14 @@ namespace altea {
         ++expectCount;
     }
 
+    void Testable::recordFailure(const std::string &message)
+    {
+        failures.push_back(message);
+    }
+
     void Testable::evaluate()
     {
+        for (auto m : failures)
+            cout << m << endl;
     }
 }
