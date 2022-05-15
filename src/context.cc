@@ -7,7 +7,7 @@ using namespace altea;
 namespace altea {
     Context context;
 
-    Context::Context(): root(NORMAL, "root", nullptr)
+    Context::Context(): root(".", 0, NORMAL, "root", nullptr)
     {
         current = &root;
     }

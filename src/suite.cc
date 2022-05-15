@@ -5,9 +5,9 @@
 using namespace std;
 
 namespace altea {
-    Suite::Suite(Mode mode, const string &description,
-        std::function<void (void)> suite): Testable(mode, description,
-        suite)
+    Suite::Suite(const string &file, int line, Mode mode,
+        const string &description, std::function<void (void)> suite):
+        Testable(file, line, mode, description, suite)
     {
     }
 
@@ -55,7 +55,7 @@ namespace altea {
         const string &description, std::function<void (void)> suite)
     {
         if (context.isDiscovery()) {
-            auto sub = new Suite(mode, description, suite);
+            auto sub = new Suite(file, line, mode, description, suite);
             auto prev = context.updateCurrent(sub);
 
             suite();
@@ -81,7 +81,8 @@ namespace altea {
             adjustMode(mode);
             ++discovered;
         } else {
-            testables.push_back(new Test(mode, description, test));
+            testables.push_back(new Test(file, line, mode, description,
+                test));
 
             if (isLastCall())
                 run();

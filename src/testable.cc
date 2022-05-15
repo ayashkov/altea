@@ -4,9 +4,10 @@
 using namespace std;
 
 namespace altea {
-    Testable::Testable(Mode mode, const std::string &description,
-        std::function<void (void)> testable): mode(mode),
-        description(description), testable(testable)
+    Testable::Testable(const string &file, int line, Mode mode,
+        const std::string &description,
+        std::function<void (void)> testable): file(file), line(line),
+        mode(mode), description(description), testable(testable)
     {
     }
 

@@ -71,9 +71,14 @@ namespace altea {
 
     class Testable {
     public:
+        const std::string file;
+
+        const int line;
+
         const std::string description;
 
-        Testable(Mode mode, const std::string &description,
+        Testable(const std::string &file, int line, Mode mode,
+            const std::string &description,
             std::function<void (void)> testable);
 
         virtual ~Testable()
@@ -125,7 +130,8 @@ namespace altea {
 
     class Test: public Testable {
     public:
-        Test(Mode mode, const std::string &description,
+        Test(const std::string &file, int line, Mode mode,
+            const std::string &description,
             std::function<void (void)> test);
 
         virtual void addBeforeAll(const std::string &file, int line,
@@ -155,7 +161,8 @@ namespace altea {
 
     class Suite: public Testable {
     public:
-        Suite(Mode mode, const std::string &description,
+        Suite(const std::string &file, int line, Mode mode,
+            const std::string &description,
             std::function<void (void)> suite);
 
         virtual ~Suite();
