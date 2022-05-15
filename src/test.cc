@@ -10,38 +10,46 @@ namespace altea {
     {
     }
 
-    void Test::addBeforeAll(std::function<void (void)> setup)
+    void Test::addBeforeAll(const string &file, int line,
+        std::function<void (void)> setup)
     {
-        throw SyntaxException("a test case cannot contain beforeAll()");
+        throw SyntaxException(file, line,
+            "a test case cannot contain beforeAll()");
     }
 
-    void Test::addBeforeEach(std::function<void (void)> setup)
+    void Test::addBeforeEach(const string &file, int line,
+        std::function<void (void)> setup)
     {
-        throw SyntaxException("a test case cannot contain beforeEach()");
+        throw SyntaxException(file, line,
+            "a test case cannot contain beforeEach()");
     }
 
-    void Test::addAfterAll(std::function<void (void)> teardown)
+    void Test::addAfterAll(const string &file, int line,
+        std::function<void (void)> teardown)
     {
-        throw SyntaxException("a test case cannot contain afterAll()");
+        throw SyntaxException(file, line,
+            "a test case cannot contain afterAll()");
     }
 
-    void Test::addAfterEach(std::function<void (void)> teardown)
+    void Test::addAfterEach(const string &file, int line,
+        std::function<void (void)> teardown)
     {
-        throw SyntaxException("a test case cannot contain afterEach()");
+        throw SyntaxException(file, line,
+            "a test case cannot contain afterEach()");
     }
 
-    void Test::addSuite(Mode mode, string description,
-        std::function<void (void)> suite)
+    void Test::addSuite(const string &file, int line, Mode mode,
+        const string &description, std::function<void (void)> suite)
     {
-        throw SyntaxException("a test case cannot contain describe(), "
-            "fdescribe(), xdescribe()");
+        throw SyntaxException(file, line,
+            "a test case cannot contain describe(), fdescribe(), xdescribe()");
     }
 
-    void Test::addTest(Mode mode, string description,
-        std::function<void (void)> test)
+    void Test::addTest(const string &file, int line, Mode mode,
+        const string &description, std::function<void (void)> test)
     {
-        throw SyntaxException("a test case cannot contain it(), fit(), "
-            "xit()");
+        throw SyntaxException(file, line,
+            "a test case cannot contain it(), fit(), xit()");
     }
 
     Matcher Test::doExpect(const string &file, int line)

@@ -10,17 +10,49 @@
 namespace altea {
     enum Mode { NORMAL, FOCUSED, EXCLUDED };
 
-    class TestException: public std::runtime_error {
+    class SourceMessage {
     public:
-        TestException(const std::string &what): std::runtime_error(what)
+        const std::string file;
+
+        const int line;
+
+        const std::string type;
+
+        const std::string message;
+
+        SourceMessage(const std::string &file, int line,
+            const std::string &type, const std::string &message):
+            file(file), line(line), type(type), message(message)
+        {
+        }
+
+        operator std::string() const
+        {
+            return type + ": " + message + " @" + file + ":" +
+                std::to_string(line);
+        }
+    };
+
+    class TestException: public std::exception {
+    public:
+        TestException(): std::exception()
         {
         }
     };
 
     class SyntaxException: public TestException {
     public:
-        SyntaxException(const std::string &what): TestException(what)
+        const std::string message;
+
+        SyntaxException(const std::string &file, int line,
+            const std::string &message): TestException(),
+            message(SourceMessage(file, line, "Syntax error", message))
         {
+        }
+
+        virtual const char *what() const noexcept
+        {
+            return message.c_str();
         }
     };
 
@@ -54,21 +86,26 @@ namespace altea {
 
         void recordExpect();
 
-        void recordFailure(const std::string &file, int line,
-            const std::string &message);
+        void addFailure(SourceMessage &failure);
 
-        virtual void addBeforeAll(std::function<void (void)> setup) = 0;
+        virtual void addBeforeAll(const std::string &file, int line,
+            std::function<void (void)> setup) = 0;
 
-        virtual void addBeforeEach(std::function<void (void)> setup) = 0;
+        virtual void addBeforeEach(const std::string &file, int line,
+            std::function<void (void)> setup) = 0;
 
-        virtual void addAfterAll(std::function<void (void)> teardown) = 0;
+        virtual void addAfterAll(const std::string &file, int line,
+            std::function<void (void)> teardown) = 0;
 
-        virtual void addAfterEach(std::function<void (void)> teardown) = 0;
+        virtual void addAfterEach(const std::string &file, int line,
+            std::function<void (void)> teardown) = 0;
 
-        virtual void addSuite(Mode mode, std::string description,
+        virtual void addSuite(const std::string &file, int line,
+            Mode mode, const std::string &description,
             std::function<void (void)> suite) = 0;
 
-        virtual void addTest(Mode mode, std::string description,
+        virtual void addTest(const std::string &file, int line,
+            Mode mode, const std::string &description,
             std::function<void (void)> test) = 0;
 
         virtual Matcher doExpect(const std::string &file, int line) = 0;
@@ -82,7 +119,7 @@ namespace altea {
 
         int expectCount = 0;
 
-        std::vector<std::string> failures;
+        std::vector<SourceMessage> failures;
     };
 
     class Test: public Testable {
@@ -90,18 +127,24 @@ namespace altea {
         Test(Mode mode, const std::string &description,
             std::function<void (void)> test);
 
-        virtual void addBeforeAll(std::function<void (void)> setup);
+        virtual void addBeforeAll(const std::string &file, int line,
+            std::function<void (void)> setup);
 
-        virtual void addBeforeEach(std::function<void (void)> setup);
+        virtual void addBeforeEach(const std::string &file, int line,
+            std::function<void (void)> setup);
 
-        virtual void addAfterAll(std::function<void (void)> teardown);
+        virtual void addAfterAll(const std::string &file, int line,
+            std::function<void (void)> teardown);
 
-        virtual void addAfterEach(std::function<void (void)> teardown);
+        virtual void addAfterEach(const std::string &file, int line,
+            std::function<void (void)> teardown);
 
-        virtual void addSuite(Mode mode, std::string description,
+        virtual void addSuite(const std::string &file, int line,
+            Mode mode, const std::string &description,
             std::function<void (void)> suite);
 
-        virtual void addTest(Mode mode, std::string description,
+        virtual void addTest(const std::string &file, int line,
+            Mode mode, const std::string &description,
             std::function<void (void)> test);
 
         virtual Matcher doExpect(const std::string &file, int line);
@@ -123,18 +166,24 @@ namespace altea {
             return this;
         }
 
-        virtual void addBeforeAll(std::function<void (void)> setup);
+        virtual void addBeforeAll(const std::string &file, int line,
+            std::function<void (void)> setup);
 
-        virtual void addBeforeEach(std::function<void (void)> setup);
+        virtual void addBeforeEach(const std::string &file, int line,
+            std::function<void (void)> setup);
 
-        virtual void addAfterAll(std::function<void (void)> teardown);
+        virtual void addAfterAll(const std::string &file, int line,
+            std::function<void (void)> teardown);
 
-        virtual void addAfterEach(std::function<void (void)> teardown);
+        virtual void addAfterEach(const std::string &file, int line,
+            std::function<void (void)> teardown);
 
-        virtual void addSuite(Mode mode, std::string description,
+        virtual void addSuite(const std::string &file, int line,
+            Mode mode, const std::string &description,
             std::function<void (void)> suite);
 
-        virtual void addTest(Mode mode, std::string description,
+        virtual void addTest(const std::string &file, int line,
+            Mode mode, const std::string &description,
             std::function<void (void)> test);
 
         virtual Matcher doExpect(const std::string &file, int line);
@@ -203,6 +252,8 @@ namespace altea {
 
         void recordExpect();
 
+        void log(const std::string &message);
+
         void recordFailure(const std::string &file, int line,
             const std::string &message);
 
@@ -217,71 +268,30 @@ namespace altea {
     };
 
     extern Context context;
-
-    inline void beforeAll(std::function<void (void)> setup)
-    {
-        context.getCurrent()->addBeforeAll(setup);
-    }
-
-    inline void beforeEach(std::function<void (void)> setup)
-    {
-        context.getCurrent()->addBeforeEach(setup);
-    }
-
-    inline void afterAll(std::function<void (void)> teardown)
-    {
-        context.getCurrent()->addAfterAll(teardown);
-    }
-
-    inline void afterEach(std::function<void (void)> teardown)
-    {
-        context.getCurrent()->addAfterEach(teardown);
-    }
-
-    inline int describe(const std::string &description,
-        std::function<void (void)> suite)
-    {
-        context.getCurrent()->addSuite(NORMAL, description, suite);
-
-        return 0;
-    }
-
-    inline int fdescribe(const std::string &description,
-        std::function<void (void)> suite)
-    {
-        context.getCurrent()->addSuite(FOCUSED, description, suite);
-
-        return 0;
-    }
-
-    inline int xdescribe(const std::string &description,
-        std::function<void (void)> suite)
-    {
-        context.getCurrent()->addSuite(EXCLUDED, description, suite);
-
-        return 0;
-    }
-
-    inline void it(const std::string &description,
-        std::function<void (void)> test)
-    {
-        context.getCurrent()->addTest(NORMAL, description, test);
-    }
-
-    inline void fit(const std::string &description,
-        std::function<void (void)> test)
-    {
-        context.getCurrent()->addTest(FOCUSED, description, test);
-    }
-
-    inline void xit(const std::string &description,
-        std::function<void (void)> test)
-    {
-        context.getCurrent()->addTest(EXCLUDED, description, test);
-    }
 }
 
+#define beforeAll(setup) (context.getCurrent() \
+    ->addBeforeAll(__FILE__, __LINE__, setup))
+#define beforeEach(setup) (context.getCurrent() \
+    ->addBeforeEach(__FILE__, __LINE__, setup))
+#define afterAll(teardown) (context.getCurrent() \
+    ->addAfterAll(__FILE__, __LINE__, teardown))
+#define afterEach(teardown) (context.getCurrent() \
+    ->addAfterEach(__FILE__, __LINE__, teardown))
+#define describe(description, suite) (context.getCurrent() \
+    ->addSuite(__FILE__, __LINE__, NORMAL, description, suite), 0)
+#define fdescribe(description, suite) (context.getCurrent() \
+    ->addSuite(__FILE__, __LINE__, FOCUSED, description, suite), 0)
+#define xdescribe(description, suite) (context.getCurrent() \
+    ->addSuite(__FILE__, __LINE__, EXCLUDED, description, suite), 0)
+#define it(description, test) (context.getCurrent() \
+    ->addTest(__FILE__, __LINE__, NORMAL, description, test))
+#define fit(description, test) (context.getCurrent() \
+    ->addTest(__FILE__, __LINE__, FOCUSED, description, test))
+#define xit(description, test) (context.getCurrent() \
+    ->addTest(__FILE__, __LINE__, EXCLUDED, description, test))
 #define expect() (context.getCurrent()->doExpect(__FILE__, __LINE__))
-#define fail(message) (context.getCurrent()->doExpect(__FILE__, __LINE__).toFail(message))
+#define fail(message) (context.getCurrent() \
+    ->doExpect(__FILE__, __LINE__).toFail(message))
 
 #endif // __ALTEA_HH

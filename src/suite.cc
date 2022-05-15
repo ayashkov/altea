@@ -19,36 +19,40 @@ namespace altea {
         testables.clear();
     }
 
-    void Suite::addBeforeAll(std::function<void (void)> setup)
+    void Suite::addBeforeAll(const string &file, int line,
+        std::function<void (void)> setup)
     {
         add([=] {
             beforeAll.push_back(setup);
         });
     }
 
-    void Suite::addBeforeEach(std::function<void (void)> setup)
+    void Suite::addBeforeEach(const string &file, int line,
+        std::function<void (void)> setup)
     {
         add([=] {
             beforeEach.push_back(setup);
         });
     }
 
-    void Suite::addAfterAll(std::function<void (void)> teardown)
+    void Suite::addAfterAll(const string &file, int line,
+        std::function<void (void)> teardown)
     {
         add([=] {
             afterAll.push_back(teardown);
         });
     }
 
-    void Suite::addAfterEach(std::function<void (void)> teardown)
+    void Suite::addAfterEach(const string &file, int line,
+        std::function<void (void)> teardown)
     {
         add([=] {
             afterEach.push_back(teardown);
         });
     }
 
-    void Suite::addSuite(Mode mode, string description,
-        std::function<void (void)> suite)
+    void Suite::addSuite(const string &file, int line, Mode mode,
+        const string &description, std::function<void (void)> suite)
     {
         if (context.isDiscovery()) {
             auto sub = new Suite(mode, description, suite);
@@ -70,8 +74,8 @@ namespace altea {
         }
     }
 
-    void Suite::addTest(Mode mode, string description,
-        std::function<void (void)> test)
+    void Suite::addTest(const string &file, int line, Mode mode,
+        const string &description, std::function<void (void)> test)
     {
         if (context.isDiscovery()) {
             adjustMode(mode);
@@ -86,7 +90,7 @@ namespace altea {
 
     Matcher Suite::doExpect(const string &file, int line)
     {
-        throw SyntaxException("a suite cannot contain expect()");
+        throw SyntaxException(file, line, "a suite cannot contain expect()");
     }
 
     void Suite::rootRun()

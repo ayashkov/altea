@@ -30,8 +30,15 @@ namespace altea {
     void Context::recordFailure(const string &file, int line,
         const string &message)
     {
+        auto m = SourceMessage(file, line, "Failure", message);
+
+        current->addFailure(m);
         failed = true;
-        current->recordFailure(file, line, message);
+    }
+
+    void Context::log(const std::string &message)
+    {
+        cout << message << endl;
     }
 }
 
@@ -42,7 +49,7 @@ int main()
 
         return context.isFailed() ? 1 : 0;
     } catch (const SyntaxException &ex) {
-        cerr << "Syntax error: " << ex.what() << endl;
+        cerr << ex.what() << endl;
     } catch (const exception &ex) {
         cerr << "Runtime error: " << ex.what() << endl;
     } catch (...) {
