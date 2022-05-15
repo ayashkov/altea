@@ -31,7 +31,7 @@ namespace altea {
         failures.push_back(failure);
     }
 
-    void Testable::evaluate()
+    void Testable::evaluate() const
     {
         for (auto m : failures)
             context.log(m);

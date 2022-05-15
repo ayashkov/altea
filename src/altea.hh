@@ -108,9 +108,10 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test) = 0;
 
-        virtual Matcher doExpect(const std::string &file, int line) = 0;
+        virtual Matcher doExpect(const std::string &file, int line)
+            const = 0;
 
-        virtual void evaluate();
+        virtual void evaluate() const;
 
     protected:
         Mode mode;
@@ -147,9 +148,9 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test);
 
-        virtual Matcher doExpect(const std::string &file, int line);
+        virtual Matcher doExpect(const std::string &file, int line) const;
 
-        virtual void evaluate();
+        virtual void evaluate() const;
     };
 
     class Suite: public Testable {
@@ -186,7 +187,7 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test);
 
-        virtual Matcher doExpect(const std::string &file, int line);
+        virtual Matcher doExpect(const std::string &file, int line) const;
 
         void rootRun();
 
@@ -224,7 +225,7 @@ namespace altea {
 
         ~Context();
 
-        inline Testable *getCurrent()
+        inline Testable *getCurrent() const
         {
             return current;
         }
@@ -238,12 +239,12 @@ namespace altea {
             return prev;
         }
 
-        inline bool isDiscovery()
+        inline bool isDiscovery() const
         {
             return discovery;
         }
 
-        inline bool isFailed()
+        inline bool isFailed() const
         {
             return failed;
         }

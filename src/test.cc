@@ -52,12 +52,12 @@ namespace altea {
             "a test case cannot contain it(), fit(), xit()");
     }
 
-    Matcher Test::doExpect(const string &file, int line)
+    Matcher Test::doExpect(const string &file, int line) const
     {
         return Matcher(file, line);
     }
 
-    void Test::evaluate()
+    void Test::evaluate() const
     {
         Testable::evaluate();
 

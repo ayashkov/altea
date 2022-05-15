@@ -88,7 +88,7 @@ namespace altea {
         }
     }
 
-    Matcher Suite::doExpect(const string &file, int line)
+    Matcher Suite::doExpect(const string &file, int line) const
     {
         throw SyntaxException(file, line, "a suite cannot contain expect()");
     }
