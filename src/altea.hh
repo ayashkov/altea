@@ -232,11 +232,6 @@ namespace altea {
 
         ~Context();
 
-        inline Testable *getCurrent() const
-        {
-            return current;
-        }
-
         inline Testable *updateCurrent(Testable *next)
         {
             auto prev = current;
@@ -254,6 +249,49 @@ namespace altea {
         inline bool isFailed() const
         {
             return failed;
+        }
+
+        inline void addBeforeAll(const std::string &file, int line,
+            std::function<void (void)> setup)
+        {
+            current->addBeforeAll(file, line, setup);
+        }
+
+        inline void addBeforeEach(const std::string &file, int line,
+            std::function<void (void)> setup)
+        {
+            current->addBeforeEach(file, line, setup);
+        }
+
+        inline void addAfterAll(const std::string &file, int line,
+            std::function<void (void)> teardown)
+        {
+            current->addAfterAll(file, line, teardown);
+        }
+
+        inline void addAfterEach(const std::string &file, int line,
+            std::function<void (void)> teardown)
+        {
+            current->addAfterEach(file, line, teardown);
+        }
+
+        inline void addSuite(const std::string &file, int line,
+            Mode mode, const std::string &description,
+            std::function<void (void)> suite)
+        {
+            current->addSuite(file, line, mode, description, suite);
+        }
+
+        inline void addTest(const std::string &file, int line,
+            Mode mode, const std::string &description,
+            std::function<void (void)> test)
+        {
+            current->addTest(file, line, mode, description, test);
+        }
+
+        inline Matcher doExpect(const std::string &file, int line)
+        {
+            return current->doExpect(file, line);
         }
 
         void run();
@@ -278,28 +316,28 @@ namespace altea {
     extern Context __context__;
 }
 
-#define beforeAll(setup) (__context__.getCurrent() \
-    ->addBeforeAll(__FILE__, __LINE__, setup))
-#define beforeEach(setup) (__context__.getCurrent() \
-    ->addBeforeEach(__FILE__, __LINE__, setup))
-#define afterAll(teardown) (__context__.getCurrent() \
-    ->addAfterAll(__FILE__, __LINE__, teardown))
-#define afterEach(teardown) (__context__.getCurrent() \
-    ->addAfterEach(__FILE__, __LINE__, teardown))
-#define describe(description, suite) (__context__.getCurrent() \
-    ->addSuite(__FILE__, __LINE__, NORMAL, description, suite), 0)
-#define fdescribe(description, suite) (__context__.getCurrent() \
-    ->addSuite(__FILE__, __LINE__, FOCUSED, description, suite), 0)
-#define xdescribe(description, suite) (__context__.getCurrent() \
-    ->addSuite(__FILE__, __LINE__, EXCLUDED, description, suite), 0)
-#define it(description, test) (__context__.getCurrent() \
-    ->addTest(__FILE__, __LINE__, NORMAL, description, test))
-#define fit(description, test) (__context__.getCurrent() \
-    ->addTest(__FILE__, __LINE__, FOCUSED, description, test))
-#define xit(description, test) (__context__.getCurrent() \
-    ->addTest(__FILE__, __LINE__, EXCLUDED, description, test))
-#define expect() (__context__.getCurrent()->doExpect(__FILE__, __LINE__))
-#define fail(message) (__context__.getCurrent() \
-    ->doExpect(__FILE__, __LINE__).toFail(message))
+#define beforeAll(setup) (__context__.addBeforeAll(__FILE__, __LINE__, \
+    setup))
+#define beforeEach(setup) (__context__.addBeforeEach(__FILE__, __LINE__, \
+    setup))
+#define afterAll(teardown) (__context__.addAfterAll(__FILE__, __LINE__, \
+    teardown))
+#define afterEach(teardown) (__context__.addAfterEach(__FILE__, \
+    __LINE__, teardown))
+#define describe(description, suite) (__context__.addSuite(__FILE__, \
+    __LINE__, NORMAL, description, suite), 0)
+#define fdescribe(description, suite) (__context__.addSuite(__FILE__, \
+    __LINE__, FOCUSED, description, suite), 0)
+#define xdescribe(description, suite) (__context__.addSuite(__FILE__, \
+    __LINE__, EXCLUDED, description, suite), 0)
+#define it(description, test) (__context__.addTest(__FILE__, __LINE__, \
+    NORMAL, description, test))
+#define fit(description, test) (__context__.addTest(__FILE__, __LINE__, \
+    FOCUSED, description, test))
+#define xit(description, test) (__context__.addTest(__FILE__, __LINE__, \
+    EXCLUDED, description, test))
+#define expect() (__context__.doExpect(__FILE__, __LINE__))
+#define fail(message) (__context__.doExpect(__FILE__, __LINE__) \
+    .toFail(message))
 
 #endif // __ALTEA_HH
