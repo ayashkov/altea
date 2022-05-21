@@ -10,6 +10,10 @@
 namespace altea {
     enum Mode { NORMAL, FOCUSED, EXCLUDED };
 
+    class Context;
+
+    class Test;
+
     class SourceMessage {
     public:
         const std::string file;
@@ -56,9 +60,9 @@ namespace altea {
         }
     };
 
-    class Matcher {
+    class VoidMatcher {
     public:
-        Matcher(const std::string &file, int line);
+        VoidMatcher(const std::string &file, int line, Test *test);
 
         void nothing();
 
@@ -67,6 +71,8 @@ namespace altea {
         std::string file;
 
         int line;
+
+        Test *test;
     };
 
     class Testable {
@@ -77,8 +83,8 @@ namespace altea {
 
         const std::string description;
 
-        Testable(const std::string &file, int line, Mode mode,
-            const std::string &description,
+        Testable(const std::string &file, int line, Context *context,
+            Mode mode, const std::string &description,
             std::function<void (void)> testable);
 
         virtual ~Testable()
@@ -91,7 +97,8 @@ namespace altea {
 
         void recordExpect();
 
-        void addFailure(SourceMessage &failure);
+        void recordFailure(const std::string &file, int line,
+            const std::string &message);
 
         virtual void addBeforeAll(const std::string &file, int line,
             std::function<void (void)> setup) = 0;
@@ -113,12 +120,13 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test) = 0;
 
-        virtual Matcher doExpect(const std::string &file, int line)
-            const = 0;
+        virtual VoidMatcher doExpect(const std::string &file, int line) = 0;
 
         virtual void evaluate() const;
 
     protected:
+        Context *context;
+
         Mode mode;
 
         std::function<void (void)> testable;
@@ -130,8 +138,8 @@ namespace altea {
 
     class Test: public Testable {
     public:
-        Test(const std::string &file, int line, Mode mode,
-            const std::string &description,
+        Test(const std::string &file, int line, Context *context,
+            Mode mode, const std::string &description,
             std::function<void (void)> test);
 
         virtual void addBeforeAll(const std::string &file, int line,
@@ -154,15 +162,15 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test);
 
-        virtual Matcher doExpect(const std::string &file, int line) const;
+        virtual VoidMatcher doExpect(const std::string &file, int line);
 
         virtual void evaluate() const;
     };
 
     class Suite: public Testable {
     public:
-        Suite(const std::string &file, int line, Mode mode,
-            const std::string &description,
+        Suite(const std::string &file, int line, Context *context,
+            Mode mode, const std::string &description,
             std::function<void (void)> suite);
 
         virtual ~Suite();
@@ -194,7 +202,7 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test);
 
-        virtual Matcher doExpect(const std::string &file, int line) const;
+        virtual VoidMatcher doExpect(const std::string &file, int line);
 
         void rootRun();
 
@@ -251,6 +259,11 @@ namespace altea {
             return failed;
         }
 
+        inline void markFailed()
+        {
+            failed = true;
+        }
+
         inline void addBeforeAll(const std::string &file, int line,
             std::function<void (void)> setup)
         {
@@ -289,19 +302,14 @@ namespace altea {
             current->addTest(file, line, mode, description, test);
         }
 
-        inline Matcher doExpect(const std::string &file, int line)
+        inline VoidMatcher doExpect(const std::string &file, int line)
         {
             return current->doExpect(file, line);
         }
 
         void run();
 
-        void recordExpect();
-
         void log(const std::string &message);
-
-        void recordFailure(const std::string &file, int line,
-            const std::string &message);
 
     private:
         Suite root;

@@ -5,9 +5,10 @@
 using namespace std;
 
 namespace altea {
-    Suite::Suite(const string &file, int line, Mode mode,
-        const string &description, std::function<void (void)> suite):
-        Testable(file, line, mode, description, suite)
+    Suite::Suite(const string &file, int line, Context *context,
+        Mode mode, const string &description,
+        std::function<void (void)> suite):
+        Testable(file, line, context, mode, description, suite)
     {
     }
 
@@ -54,12 +55,13 @@ namespace altea {
     void Suite::addSuite(const string &file, int line, Mode mode,
         const string &description, std::function<void (void)> suite)
     {
-        if (__context__.isDiscovery()) {
-            auto sub = new Suite(file, line, mode, description, suite);
-            auto prev = __context__.updateCurrent(sub);
+        if (context->isDiscovery()) {
+            auto sub = new Suite(file, line, context, mode, description,
+                suite);
+            auto prev = context->updateCurrent(sub);
 
             suite();
-            __context__.updateCurrent(prev);
+            context->updateCurrent(prev);
             subSuites.push(sub);
             adjustMode(sub->mode);
             ++discovered;
@@ -77,19 +79,19 @@ namespace altea {
     void Suite::addTest(const string &file, int line, Mode mode,
         const string &description, std::function<void (void)> test)
     {
-        if (__context__.isDiscovery()) {
+        if (context->isDiscovery()) {
             adjustMode(mode);
             ++discovered;
         } else {
-            testables.push_back(new Test(file, line, mode, description,
-                test));
+            testables.push_back(new Test(file, line, context, mode,
+                description, test));
 
             if (isLastCall())
                 run();
         }
     }
 
-    Matcher Suite::doExpect(const string &file, int line) const
+    VoidMatcher Suite::doExpect(const string &file, int line)
     {
         throw SyntaxException(file, line, "a suite cannot contain expect()");
     }
@@ -114,7 +116,7 @@ namespace altea {
 
     void Suite::add(std::function<void(void)> mutator)
     {
-        if (__context__.isDiscovery())
+        if (context->isDiscovery())
             ++discovered;
         else {
             mutator();
@@ -147,7 +149,7 @@ namespace altea {
         if (testable->skipped(focusedMode))
             return;
 
-        auto prev = __context__.updateCurrent(testable);
+        auto prev = context->updateCurrent(testable);
 
         cout << testable->description << endl;
 
@@ -160,6 +162,6 @@ namespace altea {
             teardown();
 
         testable->evaluate();
-        __context__.updateCurrent(prev);
+        context->updateCurrent(prev);
     }
 }

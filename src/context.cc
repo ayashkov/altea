@@ -7,7 +7,7 @@ using namespace altea;
 namespace altea {
     Context __context__;
 
-    Context::Context(): root(".", 0, NORMAL, "root", nullptr)
+    Context::Context(): root(".", 0, this, NORMAL, "root", nullptr)
     {
         current = &root;
     }
@@ -20,20 +20,6 @@ namespace altea {
     {
         discovery = false;
         root.rootRun();
-    }
-
-    void Context::recordExpect()
-    {
-        current->recordExpect();
-    }
-
-    void Context::recordFailure(const string &file, int line,
-        const string &message)
-    {
-        auto m = SourceMessage(file, line, "Failure", message);
-
-        current->addFailure(m);
-        failed = true;
     }
 
     void Context::log(const std::string &message)

@@ -3,18 +3,19 @@
 using namespace std;
 
 namespace altea {
-    Matcher::Matcher(const string &file, int line): file(file), line(line)
+    VoidMatcher::VoidMatcher(const string &file, int line, Test *test):
+        file(file), line(line), test(test)
     {
     }
 
-    void Matcher::nothing()
+    void VoidMatcher::nothing()
     {
-        __context__.recordExpect();
+        test->recordExpect();
     }
 
-    void Matcher::toFail(const std::string &message)
+    void VoidMatcher::toFail(const std::string &message)
     {
-        __context__.recordExpect();
-        __context__.recordFailure(file, line, message);
+        test->recordExpect();
+        test->recordFailure(file, line, message);
     }
 }

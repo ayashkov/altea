@@ -4,10 +4,11 @@
 using namespace std;
 
 namespace altea {
-    Testable::Testable(const string &file, int line, Mode mode,
-        const std::string &description,
+    Testable::Testable(const string &file, int line, Context *context,
+        Mode mode, const std::string &description,
         std::function<void (void)> testable): file(file), line(line),
-        mode(mode), description(description), testable(testable)
+        context(context), mode(mode), description(description),
+        testable(testable)
     {
     }
 
@@ -27,14 +28,16 @@ namespace altea {
         ++expectCount;
     }
 
-    void Testable::addFailure(SourceMessage &failure)
+    void Testable::recordFailure(const string &file, int line,
+        const string &message)
     {
-        failures.push_back(failure);
+        failures.push_back(SourceMessage(file, line, "Failure", message));
+        context->markFailed();
     }
 
     void Testable::evaluate() const
     {
         for (auto m : failures)
-            __context__.log(m);
+            context->log(m);
     }
 }

@@ -4,9 +4,9 @@
 using namespace std;
 
 namespace altea {
-    Test::Test(const string &file, int line, Mode mode,
+    Test::Test(const string &file, int line, Context *context, Mode mode,
         const string &description, std::function<void (void)> test):
-        Testable(file, line, mode, description, test)
+        Testable(file, line, context, mode, description, test)
     {
     }
 
@@ -52,15 +52,15 @@ namespace altea {
             "a test case cannot contain it(), fit(), xit()");
     }
 
-    Matcher Test::doExpect(const string &file, int line) const
+    VoidMatcher Test::doExpect(const string &file, int line)
     {
-        return Matcher(file, line);
+        return VoidMatcher(file, line, this);
     }
 
     void Test::evaluate() const
     {
         if (expectCount == 0)
-            __context__.log(SourceMessage(file, line, "Warning",
+            context->log(SourceMessage(file, line, "Warning",
                 "test case '" + description + "' defines no expectations"));
 
         Testable::evaluate();
