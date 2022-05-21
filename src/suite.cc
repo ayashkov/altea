@@ -54,12 +54,12 @@ namespace altea {
     void Suite::addSuite(const string &file, int line, Mode mode,
         const string &description, std::function<void (void)> suite)
     {
-        if (context.isDiscovery()) {
+        if (__context__.isDiscovery()) {
             auto sub = new Suite(file, line, mode, description, suite);
-            auto prev = context.updateCurrent(sub);
+            auto prev = __context__.updateCurrent(sub);
 
             suite();
-            context.updateCurrent(prev);
+            __context__.updateCurrent(prev);
             subSuites.push(sub);
             adjustMode(sub->mode);
             ++discovered;
@@ -77,7 +77,7 @@ namespace altea {
     void Suite::addTest(const string &file, int line, Mode mode,
         const string &description, std::function<void (void)> test)
     {
-        if (context.isDiscovery()) {
+        if (__context__.isDiscovery()) {
             adjustMode(mode);
             ++discovered;
         } else {
@@ -114,7 +114,7 @@ namespace altea {
 
     void Suite::add(std::function<void(void)> mutator)
     {
-        if (context.isDiscovery())
+        if (__context__.isDiscovery())
             ++discovered;
         else {
             mutator();
@@ -147,7 +147,7 @@ namespace altea {
         if (testable->skipped(focusedMode))
             return;
 
-        auto prev = context.updateCurrent(testable);
+        auto prev = __context__.updateCurrent(testable);
 
         cout << testable->description << endl;
 
@@ -160,6 +160,6 @@ namespace altea {
             teardown();
 
         testable->evaluate();
-        context.updateCurrent(prev);
+        __context__.updateCurrent(prev);
     }
 }

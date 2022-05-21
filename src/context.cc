@@ -5,7 +5,7 @@ using namespace std;
 using namespace altea;
 
 namespace altea {
-    Context context;
+    Context __context__;
 
     Context::Context(): root(".", 0, NORMAL, "root", nullptr)
     {
@@ -45,9 +45,9 @@ namespace altea {
 int main()
 {
     try {
-        context.run();
+        __context__.run();
 
-        return context.isFailed() ? 1 : 0;
+        return __context__.isFailed() ? 1 : 0;
     } catch (const SyntaxException &ex) {
         cerr << ex.what() << endl;
     } catch (const exception &ex) {

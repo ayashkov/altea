@@ -275,31 +275,31 @@ namespace altea {
         bool failed = false;
     };
 
-    extern Context context;
+    extern Context __context__;
 }
 
-#define beforeAll(setup) (context.getCurrent() \
+#define beforeAll(setup) (__context__.getCurrent() \
     ->addBeforeAll(__FILE__, __LINE__, setup))
-#define beforeEach(setup) (context.getCurrent() \
+#define beforeEach(setup) (__context__.getCurrent() \
     ->addBeforeEach(__FILE__, __LINE__, setup))
-#define afterAll(teardown) (context.getCurrent() \
+#define afterAll(teardown) (__context__.getCurrent() \
     ->addAfterAll(__FILE__, __LINE__, teardown))
-#define afterEach(teardown) (context.getCurrent() \
+#define afterEach(teardown) (__context__.getCurrent() \
     ->addAfterEach(__FILE__, __LINE__, teardown))
-#define describe(description, suite) (context.getCurrent() \
+#define describe(description, suite) (__context__.getCurrent() \
     ->addSuite(__FILE__, __LINE__, NORMAL, description, suite), 0)
-#define fdescribe(description, suite) (context.getCurrent() \
+#define fdescribe(description, suite) (__context__.getCurrent() \
     ->addSuite(__FILE__, __LINE__, FOCUSED, description, suite), 0)
-#define xdescribe(description, suite) (context.getCurrent() \
+#define xdescribe(description, suite) (__context__.getCurrent() \
     ->addSuite(__FILE__, __LINE__, EXCLUDED, description, suite), 0)
-#define it(description, test) (context.getCurrent() \
+#define it(description, test) (__context__.getCurrent() \
     ->addTest(__FILE__, __LINE__, NORMAL, description, test))
-#define fit(description, test) (context.getCurrent() \
+#define fit(description, test) (__context__.getCurrent() \
     ->addTest(__FILE__, __LINE__, FOCUSED, description, test))
-#define xit(description, test) (context.getCurrent() \
+#define xit(description, test) (__context__.getCurrent() \
     ->addTest(__FILE__, __LINE__, EXCLUDED, description, test))
-#define expect() (context.getCurrent()->doExpect(__FILE__, __LINE__))
-#define fail(message) (context.getCurrent() \
+#define expect() (__context__.getCurrent()->doExpect(__FILE__, __LINE__))
+#define fail(message) (__context__.getCurrent() \
     ->doExpect(__FILE__, __LINE__).toFail(message))
 
 #endif // __ALTEA_HH

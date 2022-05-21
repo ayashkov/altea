@@ -35,6 +35,6 @@ namespace altea {
     void Testable::evaluate() const
     {
         for (auto m : failures)
-            context.log(m);
+            __context__.log(m);
     }
 }

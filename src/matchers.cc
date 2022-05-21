@@ -9,12 +9,12 @@ namespace altea {
 
     void Matcher::nothing()
     {
-        context.recordExpect();
+        __context__.recordExpect();
     }
 
     void Matcher::toFail(const std::string &message)
     {
-        context.recordExpect();
-        context.recordFailure(file, line, message);
+        __context__.recordExpect();
+        __context__.recordFailure(file, line, message);
     }
 }

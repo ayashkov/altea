@@ -60,7 +60,7 @@ namespace altea {
     void Test::evaluate() const
     {
         if (expectCount == 0)
-            context.log(SourceMessage(file, line, "Warning",
+            __context__.log(SourceMessage(file, line, "Warning",
                 "test case '" + description + "' defines no expectations"));
 
         Testable::evaluate();
