@@ -27,19 +27,23 @@ vpath %.hh $(INCLUDE)
 
 .PHONY: all test clean
 
-all: test
+all: libaltea.a libaltea.so
 
-test: altea
-	./altea
+test: altea.altea
+	./altea.altea
 
 clean:
-	$(RM) -f altea
+	$(RM) -f *.altea
 	$(RM) -f *.o
 	$(RM) -f *.a
+	$(RM) -f *.so
 
 libaltea.a: $(OBJS)
 	$(AR) -cr $@ $^
 	$(RANLIB) $@
 
-altea: libaltea.a $(TESTS)
+libaltea.so: libaltea.a
+	$(LINK.cc) -shared -o $@ $^
+
+altea.altea: libaltea.a $(TESTS)
 	$(LINK.cc) -o $@ $^
