@@ -28,7 +28,7 @@ $(BIN)/libaltea.a: $(BIN)/context.o $(BIN)/testable.o $(BIN)/suite.o \
 	$(AR) -cr $@ $^
 	$(RANLIB) $@
 
-$(TEST)/altea: $(BIN)/libaltea.a $(TEST)/spec1.o $(TEST)/spec2.o
+$(TEST)/altea: $(BIN)/libaltea.a $(TEST)/spec1.o $(TEST)/context.o
 	$(CXX) -o $@ $+
 
 $(BIN):
