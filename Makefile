@@ -4,13 +4,11 @@ INCLUDE = src/include
 SPEC = test
 
 TARGET = target
-BIN = $(TARGET)/bin
-TEST = $(TARGET)/test
 
 SRCS := $(notdir $(wildcard $(SRC)/*.cc))
 SPECS := $(notdir $(wildcard $(SPEC)/*.cc))
-OBJS := $(patsubst %.cc,%.o,$(SRCS))
-TESTS := $(patsubst %.cc,%.o,$(SPECS))
+OBJS := $(patsubst %.cc,$(TARGET)/%.o,$(SRCS))
+TESTS := $(patsubst %.cc,$(TARGET)/%.o,$(SPECS))
 
 # options
 CXXFLAGS = -std=c++17 -MMD -MP
@@ -23,30 +21,31 @@ RM=rm
 
 vpath %.spec.cc $(SPEC)
 vpath %.cc $(SRC)
-vpath %.hh $(INCLUDE)
 
 .PHONY: all test clean
 
-all: libaltea.a libaltea.so
+all: $(TARGET)/libaltea.a $(TARGET)/libaltea.so
 
-test: altea.altea
-	./altea.altea
+test: $(TARGET)/altea.altea
+	$(TARGET)/altea.altea
+
+$(TARGET):
+	$(MKDIR) -p $@
+
+$(TARGET)/%.o: %.cc | $(TARGET)
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
 
 clean:
-	$(RM) -f *.d
-	$(RM) -f *.o
-	$(RM) -f *.a
-	$(RM) -f *.so
-	$(RM) -f *.altea
+	$(RM) -rf $(TARGET)
 
-libaltea.a: $(OBJS)
+$(TARGET)/libaltea.a: $(OBJS)
 	$(AR) -cr $@ $^
 	$(RANLIB) $@
 
-libaltea.so: libaltea.a
+$(TARGET)/libaltea.so: $(TARGET)/libaltea.a
 	$(LINK.cc) -shared -o $@ $^
 
-altea.altea: libaltea.a $(TESTS)
+$(TARGET)/altea.altea: $(TARGET)/libaltea.a $(TESTS)
 	$(LINK.cc) -o $@ $^
 
--include $(patsubst %.cc,%.d,$(SRCS))
+-include $(patsubst %.cc,$(TARGET)/%.d,$(SRCS))
