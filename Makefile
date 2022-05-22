@@ -13,7 +13,7 @@ OBJS := $(patsubst %.cc,%.o,$(SRCS))
 TESTS := $(patsubst %.cc,%.o,$(SPECS))
 
 # options
-CXXFLAGS = -std=c++17
+CXXFLAGS = -std=c++17 -MMD -MP
 CPPFLAGS = -I$(INCLUDE)
 
 # tools
@@ -33,10 +33,11 @@ test: altea.altea
 	./altea.altea
 
 clean:
-	$(RM) -f *.altea
+	$(RM) -f *.d
 	$(RM) -f *.o
 	$(RM) -f *.a
 	$(RM) -f *.so
+	$(RM) -f *.altea
 
 libaltea.a: $(OBJS)
 	$(AR) -cr $@ $^
@@ -47,3 +48,5 @@ libaltea.so: libaltea.a
 
 altea.altea: libaltea.a $(TESTS)
 	$(LINK.cc) -o $@ $^
+
+-include $(patsubst %.cc,%.d,$(SRCS))
