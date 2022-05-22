@@ -1,6 +1,8 @@
-#include <climits>
 #include <iostream>
-#include "altea.hh"
+
+#include "suite.hh"
+#include "test.hh"
+#include "context.hh"
 
 using namespace std;
 

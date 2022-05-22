@@ -1,5 +1,8 @@
 #include <iostream>
-#include "altea.hh"
+
+#include "testable.hh"
+#include "context.hh"
+#include "syntax-exception.hh"
 
 using namespace std;
 
