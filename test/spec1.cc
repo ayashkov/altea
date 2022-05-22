@@ -25,11 +25,11 @@ static auto _ = describe("Top-level 1", [] {
     });
 
     it("should run one test", [&] {
-        expect().nothing();
+        expect(2 * 2 == 4).toBeTrue();
     });
 
     it("should run more than one test", [&] {
-        expect().nothing();
+        expect(1 == 2).toBeFalse();
     });
 
     it("should have access to variables", [&] {

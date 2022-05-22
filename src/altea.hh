@@ -60,19 +60,37 @@ namespace altea {
         }
     };
 
-    class VoidMatcher {
+    class BaseMatcher {
+    public:
+        BaseMatcher(const std::string &file, int line, Test *test);
+
+    protected:
+        std::string file;
+
+        int line;
+
+        Test *test;
+    };
+
+    class VoidMatcher: public BaseMatcher {
     public:
         VoidMatcher(const std::string &file, int line, Test *test);
 
         void nothing();
 
         void toFail(const std::string &description);
+    };
+
+    class BoolMatcher: public BaseMatcher {
+    public:
+        BoolMatcher(const std::string &file, int line, Test *test,
+            bool value);
+
+        void toBeTrue();
+
+        void toBeFalse();
     private:
-        std::string file;
-
-        int line;
-
-        Test *test;
+        bool value;
     };
 
     class Testable {
@@ -120,7 +138,10 @@ namespace altea {
             Mode mode, const std::string &description,
             std::function<void (void)> test) = 0;
 
-        virtual VoidMatcher doExpect(const std::string &file, int line) = 0;
+        virtual VoidMatcher doExpect(const std::string &file, int line);
+
+        virtual BoolMatcher doExpect(const std::string &file, int line,
+            bool value);
 
         virtual void evaluate() const;
 
@@ -164,6 +185,9 @@ namespace altea {
 
         virtual VoidMatcher doExpect(const std::string &file, int line);
 
+        virtual BoolMatcher doExpect(const std::string &file, int line,
+            bool value);
+
         virtual void evaluate() const;
     };
 
@@ -201,8 +225,6 @@ namespace altea {
         virtual void addTest(const std::string &file, int line,
             Mode mode, const std::string &description,
             std::function<void (void)> test);
-
-        virtual VoidMatcher doExpect(const std::string &file, int line);
 
         void rootRun();
 
@@ -307,6 +329,12 @@ namespace altea {
             return current->doExpect(file, line);
         }
 
+        inline BoolMatcher doExpect(const std::string &file, int line,
+            bool value)
+        {
+            return current->doExpect(file, line, value);
+        }
+
         void run();
 
         void log(const std::string &message);
@@ -325,26 +353,26 @@ namespace altea {
 }
 
 #define beforeAll(setup) (__context__.addBeforeAll(__FILE__, __LINE__, \
-    setup))
+    (setup)))
 #define beforeEach(setup) (__context__.addBeforeEach(__FILE__, __LINE__, \
-    setup))
+    (setup)))
 #define afterAll(teardown) (__context__.addAfterAll(__FILE__, __LINE__, \
-    teardown))
+    (teardown)))
 #define afterEach(teardown) (__context__.addAfterEach(__FILE__, \
-    __LINE__, teardown))
+    __LINE__, (teardown)))
 #define describe(description, suite) (__context__.addSuite(__FILE__, \
-    __LINE__, NORMAL, description, suite), 0)
+    __LINE__, NORMAL, (description), (suite)), 0)
 #define fdescribe(description, suite) (__context__.addSuite(__FILE__, \
-    __LINE__, FOCUSED, description, suite), 0)
+    __LINE__, FOCUSED, (description), (suite)), 0)
 #define xdescribe(description, suite) (__context__.addSuite(__FILE__, \
-    __LINE__, EXCLUDED, description, suite), 0)
+    __LINE__, EXCLUDED, (description), (suite)), 0)
 #define it(description, test) (__context__.addTest(__FILE__, __LINE__, \
-    NORMAL, description, test))
+    NORMAL, (description), (test)))
 #define fit(description, test) (__context__.addTest(__FILE__, __LINE__, \
-    FOCUSED, description, test))
+    FOCUSED, (description), (test)))
 #define xit(description, test) (__context__.addTest(__FILE__, __LINE__, \
-    EXCLUDED, description, test))
-#define expect() (__context__.doExpect(__FILE__, __LINE__))
+    EXCLUDED, (description), (test)))
+#define expect(obj...) (__context__.doExpect(__FILE__, __LINE__, ##obj))
 #define fail(message) (__context__.doExpect(__FILE__, __LINE__) \
     .toFail(message))
 

@@ -57,6 +57,11 @@ namespace altea {
         return VoidMatcher(file, line, this);
     }
 
+    BoolMatcher Test::doExpect(const string &file, int line, bool value)
+    {
+        return BoolMatcher(file, line, this, value);
+    }
+
     void Test::evaluate() const
     {
         if (expectCount == 0)

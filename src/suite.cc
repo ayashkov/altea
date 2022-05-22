@@ -91,11 +91,6 @@ namespace altea {
         }
     }
 
-    VoidMatcher Suite::doExpect(const string &file, int line)
-    {
-        throw SyntaxException(file, line, "a suite cannot contain expect()");
-    }
-
     void Suite::rootRun()
     {
         while (!subSuites.empty()) {

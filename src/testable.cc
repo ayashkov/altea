@@ -23,6 +23,16 @@ namespace altea {
             testable();
     }
 
+    VoidMatcher Testable::doExpect(const string &file, int line)
+    {
+        throw SyntaxException(file, line, "only a test can contain expect()");
+    }
+
+    BoolMatcher Testable::doExpect(const string &file, int line, bool value)
+    {
+        throw SyntaxException(file, line, "only a test can contain expect()");
+    }
+
     void Testable::recordExpect()
     {
         ++expectCount;
