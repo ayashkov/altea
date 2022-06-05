@@ -1,11 +1,7 @@
-#include <algorithm>
-#include <iostream>
-
 #include "altea.hh"
 #include "test-event-processor.hh"
 
 using namespace altea;
-using namespace std;
 
 static auto _ = describe("Context", [] {
     TestEventProcessor *ep;
