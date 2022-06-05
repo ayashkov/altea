@@ -2,13 +2,16 @@
 #include <exception>
 
 #include "context.hh"
+#include "default-event-processor.hh"
 #include "syntax-exception.hh"
 
 using namespace std;
 using namespace altea;
 
 namespace altea {
-    Context __context__;
+    static DefaultEventProcessor eventProcessor;
+
+    Context __context__(&eventProcessor);
 }
 
 int main(int argc, char *argv[])

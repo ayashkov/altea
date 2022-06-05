@@ -4,8 +4,8 @@
 using namespace std;
 
 namespace altea {
-    BoolMatcher::BoolMatcher(const string &file, int line, Test *test,
-        bool value): BaseMatcher(file, line, test), value(value)
+    BoolMatcher::BoolMatcher(const Location &location, Test *const test,
+        const bool value): BaseMatcher(location, test), value(value)
     {
     }
 
@@ -14,7 +14,7 @@ namespace altea {
         test->recordExpect();
 
         if (!value)
-            test->recordFailure(file, line, "expected the value to be "
+            test->recordFailure(location, "expected the value to be "
                 "true but was false");
     }
 
@@ -23,7 +23,7 @@ namespace altea {
         test->recordExpect();
 
         if (value)
-            test->recordFailure(file, line, "expected the value to be "
+            test->recordFailure(location, "expected the value to be "
                 "false but was true");
     }
 }

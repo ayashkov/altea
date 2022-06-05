@@ -8,8 +8,8 @@
 namespace altea {
     class BoolMatcher: public BaseMatcher {
     public:
-        BoolMatcher(const std::string &file, int line, Test *test,
-            bool value);
+        BoolMatcher(const Location &location, Test *const test,
+            const bool value);
 
         void toBeTrue();
 

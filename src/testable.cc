@@ -7,33 +7,28 @@
 using namespace std;
 
 namespace altea {
-    Testable::Testable(const string &file, int line, Context *context,
-        Mode mode, const std::string &description,
-        std::function<void (void)> testable): file(file), line(line),
-        context(context), mode(mode), description(description),
-        testable(testable)
+    Testable::Testable(const Location &location, Context *const context,
+        const Mode mode, const string &description,
+        function<void (void)> testable):
+        Executable(location, context, testable), mode(mode),
+        description(description)
     {
     }
 
-    bool Testable::skipped(bool focusedMode)
+    bool Testable::skipped(const bool focusedMode)
     {
         return mode == EXCLUDED || (focusedMode && mode != FOCUSED);
     }
 
-    void Testable::test()
+    VoidMatcher Testable::doExpect(const Location &location)
     {
-        if (testable)
-            testable();
+        throw SyntaxException(location, "only a test can contain expect()");
     }
 
-    VoidMatcher Testable::doExpect(const string &file, int line)
+    BoolMatcher Testable::doExpect(const Location &location,
+        const bool value)
     {
-        throw SyntaxException(file, line, "only a test can contain expect()");
-    }
-
-    BoolMatcher Testable::doExpect(const string &file, int line, bool value)
-    {
-        throw SyntaxException(file, line, "only a test can contain expect()");
+        throw SyntaxException(location, "only a test can contain expect()");
     }
 
     void Testable::recordExpect()
@@ -41,16 +36,10 @@ namespace altea {
         ++expectCount;
     }
 
-    void Testable::recordFailure(const string &file, int line,
+    void Testable::recordFailure(const Location &location,
         const string &message)
     {
-        failures.push_back(SourceMessage(file, line, "Failure", message));
+        // failures.push_back(SourceMessage(location, "Failure", message));
         context->markFailed();
-    }
-
-    void Testable::evaluate() const
-    {
-        for (auto m : failures)
-            context->log(m);
     }
 }

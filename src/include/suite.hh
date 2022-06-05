@@ -6,42 +6,43 @@
 #include <queue>
 #include <vector>
 
+#include "event.hh"
 #include "testable.hh"
 
 namespace altea {
     class Suite: public Testable {
     public:
-        Suite(const std::string &file, int line, Context *context,
-            Mode mode, const std::string &description,
+        Suite(const Location &location, Context *const context,
+            const Mode mode, const std::string &description,
             std::function<void (void)> suite);
 
         virtual ~Suite();
 
         inline Suite *with(std::function<void (void)> suite)
         {
-            testable = suite;
+            executable = suite;
 
             return this;
         }
 
-        virtual void addBeforeAll(const std::string &file, int line,
+        virtual void addBeforeAll(const Location &location,
             std::function<void (void)> setup);
 
-        virtual void addBeforeEach(const std::string &file, int line,
+        virtual void addBeforeEach(const Location &location,
             std::function<void (void)> setup);
 
-        virtual void addAfterAll(const std::string &file, int line,
+        virtual void addAfterAll(const Location &location,
             std::function<void (void)> teardown);
 
-        virtual void addAfterEach(const std::string &file, int line,
+        virtual void addAfterEach(const Location &location,
             std::function<void (void)> teardown);
 
-        virtual void addSuite(const std::string &file, int line,
-            Mode mode, const std::string &description,
+        virtual void addSuite(const Location &location, const Mode mode,
+            const std::string &description,
             std::function<void (void)> suite);
 
-        virtual void addTest(const std::string &file, int line,
-            Mode mode, const std::string &description,
+        virtual void addTest(const Location &location, const Mode mode,
+            const std::string &description,
             std::function<void (void)> test);
 
         void rootRun();
@@ -53,17 +54,17 @@ namespace altea {
 
         std::queue<Suite*> subSuites;
 
-        std::vector<std::function<void (void)>> beforeAll;
+        std::vector<Executable> beforeAll;
 
-        std::vector<std::function<void (void)>> beforeEach;
+        std::vector<Executable> beforeEach;
 
-        std::vector<std::function<void (void)>> afterAll;
+        std::vector<Executable> afterAll;
 
-        std::vector<std::function<void (void)>> afterEach;
+        std::vector<Executable> afterEach;
 
         std::vector<Testable*> testables;
 
-        void adjustMode(Mode mode);
+        void adjustMode(const Mode mode);
 
         void add(std::function<void(void)> mutator);
 
@@ -71,7 +72,10 @@ namespace altea {
 
         void run();
 
-        void runOne(Testable *testable);
+        void runTestable(Testable *const testable);
+
+        void runExecutable(Executable *const executable,
+            const Target target, const std::string &description);
     };
 }
 

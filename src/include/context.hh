@@ -4,13 +4,15 @@
 #include <string>
 #include <functional>
 
+#include "location.hh"
 #include "testable.hh"
 #include "suite.hh"
+#include "event-processor.hh"
 
 namespace altea {
     class Context {
     public:
-        Context();
+        Context(EventProcessor *eventProcessor);
 
         ~Context();
 
@@ -38,63 +40,70 @@ namespace altea {
             failed = true;
         }
 
-        inline void addBeforeAll(const std::string &file, int line,
+        inline void addBeforeAll(const std::string &file, const int line,
             std::function<void (void)> setup)
         {
-            current->addBeforeAll(file, line, setup);
+            current->addBeforeAll(Location(file, line), setup);
         }
 
-        inline void addBeforeEach(const std::string &file, int line,
+        inline void addBeforeEach(const std::string &file, const int line,
             std::function<void (void)> setup)
         {
-            current->addBeforeEach(file, line, setup);
+            current->addBeforeEach(Location(file, line), setup);
         }
 
-        inline void addAfterAll(const std::string &file, int line,
+        inline void addAfterAll(const std::string &file, const int line,
             std::function<void (void)> teardown)
         {
-            current->addAfterAll(file, line, teardown);
+            current->addAfterAll(Location(file, line), teardown);
         }
 
-        inline void addAfterEach(const std::string &file, int line,
+        inline void addAfterEach(const std::string &file, const int line,
             std::function<void (void)> teardown)
         {
-            current->addAfterEach(file, line, teardown);
+            current->addAfterEach(Location(file, line), teardown);
         }
 
-        inline void addSuite(const std::string &file, int line,
-            Mode mode, const std::string &description,
+        inline void addSuite(const std::string &file, const int line,
+            const Mode mode, const std::string &description,
             std::function<void (void)> suite)
         {
-            current->addSuite(file, line, mode, description, suite);
+            current->addSuite(Location(file, line), mode, description,
+                suite);
         }
 
-        inline void addTest(const std::string &file, int line,
-            Mode mode, const std::string &description,
+        inline void addTest(const std::string &file, const int line,
+            const Mode mode, const std::string &description,
             std::function<void (void)> test)
         {
-            current->addTest(file, line, mode, description, test);
+            current->addTest(Location(file, line), mode, description, test);
         }
 
-        inline VoidMatcher doExpect(const std::string &file, int line)
+        inline VoidMatcher doExpect(const std::string &file,
+            const int line)
         {
-            return current->doExpect(file, line);
+            return current->doExpect(Location(file, line));
         }
 
-        inline BoolMatcher doExpect(const std::string &file, int line,
-            bool value)
+        inline BoolMatcher doExpect(const std::string &file,
+            const int line, const bool value)
         {
-            return current->doExpect(file, line, value);
+            return current->doExpect(Location(file, line), value);
+        }
+
+        inline void process(const Event &event)
+        {
+            eventProcessor->process(event);
         }
 
         void run();
-
-        void log(const std::string &message);
 
     private:
         Suite root;
 
         Testable *current;
+
+        EventProcessor *eventProcessor;
 
         bool discovery = true;
 

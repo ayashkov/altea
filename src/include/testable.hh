@@ -5,6 +5,7 @@
 #include <functional>
 #include <vector>
 
+#include "executable.hh"
 #include "void-matcher.hh"
 #include "bool-matcher.hh"
 #include "source-message.hh"
@@ -14,68 +15,50 @@ namespace altea {
 
     class Context;
 
-    class Testable {
+    class Testable: public Executable {
     public:
-        const std::string file;
-
-        const int line;
-
         const std::string description;
 
-        Testable(const std::string &file, int line, Context *context,
-            Mode mode, const std::string &description,
+        Testable(const Location &location, Context *const context,
+            const Mode mode, const std::string &description,
             std::function<void (void)> testable);
 
-        virtual ~Testable()
-        {
-        }
-
-        bool skipped(bool focusedMode);
-
-        void test();
+        bool skipped(const bool focusedMode);
 
         void recordExpect();
 
-        void recordFailure(const std::string &file, int line,
+        void recordFailure(const Location &location,
             const std::string &message);
 
-        virtual void addBeforeAll(const std::string &file, int line,
+        virtual void addBeforeAll(const Location &location,
             std::function<void (void)> setup) = 0;
 
-        virtual void addBeforeEach(const std::string &file, int line,
+        virtual void addBeforeEach(const Location &location,
             std::function<void (void)> setup) = 0;
 
-        virtual void addAfterAll(const std::string &file, int line,
+        virtual void addAfterAll(const Location &location,
             std::function<void (void)> teardown) = 0;
 
-        virtual void addAfterEach(const std::string &file, int line,
+        virtual void addAfterEach(const Location &location,
             std::function<void (void)> teardown) = 0;
 
-        virtual void addSuite(const std::string &file, int line,
-            Mode mode, const std::string &description,
+        virtual void addSuite(const Location &location, const Mode mode,
+            const std::string &description,
             std::function<void (void)> suite) = 0;
 
-        virtual void addTest(const std::string &file, int line,
-            Mode mode, const std::string &description,
+        virtual void addTest(const Location &location, const Mode mode,
+            const std::string &description,
             std::function<void (void)> test) = 0;
 
-        virtual VoidMatcher doExpect(const std::string &file, int line);
+        virtual VoidMatcher doExpect(const Location &location);
 
-        virtual BoolMatcher doExpect(const std::string &file, int line,
-            bool value);
-
-        virtual void evaluate() const;
+        virtual BoolMatcher doExpect(const Location &location,
+            const bool value);
 
     protected:
-        Context *const context;
-
         Mode mode;
 
-        std::function<void (void)> testable;
-
         int expectCount = 0;
-
-        std::vector<SourceMessage> failures;
     };
 }
 

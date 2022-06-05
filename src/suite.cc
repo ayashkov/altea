@@ -1,4 +1,4 @@
-#include <iostream>
+#include <exception>
 
 #include "suite.hh"
 #include "test.hh"
@@ -7,10 +7,10 @@
 using namespace std;
 
 namespace altea {
-    Suite::Suite(const string &file, int line, Context *context,
-        Mode mode, const string &description,
-        std::function<void (void)> suite):
-        Testable(file, line, context, mode, description, suite)
+    Suite::Suite(const Location &location, Context *const context,
+        const Mode mode, const string &description,
+        function<void (void)> suite):
+        Testable(location, context, mode, description, suite)
     {
     }
 
@@ -22,43 +22,43 @@ namespace altea {
         testables.clear();
     }
 
-    void Suite::addBeforeAll(const string &file, int line,
-        std::function<void (void)> setup)
+    void Suite::addBeforeAll(const Location &location,
+        function<void (void)> setup)
     {
         add([=] {
-            beforeAll.push_back(setup);
+            beforeAll.push_back(Executable(location, context, setup));
         });
     }
 
-    void Suite::addBeforeEach(const string &file, int line,
-        std::function<void (void)> setup)
+    void Suite::addBeforeEach(const Location &location,
+        function<void (void)> setup)
     {
         add([=] {
-            beforeEach.push_back(setup);
+            beforeEach.push_back(Executable(location, context, setup));
         });
     }
 
-    void Suite::addAfterAll(const string &file, int line,
-        std::function<void (void)> teardown)
+    void Suite::addAfterAll(const Location &location,
+        function<void (void)> teardown)
     {
         add([=] {
-            afterAll.push_back(teardown);
+            afterAll.push_back(Executable(location, context, teardown));
         });
     }
 
-    void Suite::addAfterEach(const string &file, int line,
-        std::function<void (void)> teardown)
+    void Suite::addAfterEach(const Location &location,
+        function<void (void)> teardown)
     {
         add([=] {
-            afterEach.push_back(teardown);
+            afterEach.push_back(Executable(location, context, teardown));
         });
     }
 
-    void Suite::addSuite(const string &file, int line, Mode mode,
-        const string &description, std::function<void (void)> suite)
+    void Suite::addSuite(const Location &location, const Mode mode,
+        const string &description, function<void (void)> suite)
     {
         if (context->isDiscovery()) {
-            auto sub = new Suite(file, line, context, mode, description,
+            auto sub = new Suite(location, context, mode, description,
                 suite);
             auto prev = context->updateCurrent(sub);
 
@@ -78,14 +78,14 @@ namespace altea {
         }
     }
 
-    void Suite::addTest(const string &file, int line, Mode mode,
-        const string &description, std::function<void (void)> test)
+    void Suite::addTest(const Location &location, const Mode mode,
+        const string &description, function<void (void)> test)
     {
         if (context->isDiscovery()) {
             adjustMode(mode);
             ++discovered;
         } else {
-            testables.push_back(new Test(file, line, context, mode,
+            testables.push_back(new Test(location, context, mode,
                 description, test));
 
             if (isLastCall())
@@ -99,11 +99,11 @@ namespace altea {
             auto sub = subSuites.front();
 
             subSuites.pop();
-            runOne(sub);
+            runTestable(sub);
         }
     }
 
-    void Suite::adjustMode(Mode mode)
+    void Suite::adjustMode(const Mode mode)
     {
         if (mode == FOCUSED) {
             focusedMode = true;
@@ -111,7 +111,7 @@ namespace altea {
         }
     }
 
-    void Suite::add(std::function<void(void)> mutator)
+    void Suite::add(function<void(void)> mutator)
     {
         if (context->isDiscovery())
             ++discovered;
@@ -132,33 +132,47 @@ namespace altea {
     void Suite::run()
     {
         for (auto setup : beforeAll)
-            setup();
+            runExecutable(&setup, BEFORE_ALL, "");
 
         for (auto testable : testables)
-            runOne(testable);
+            runTestable(testable);
 
         for (auto teardown : afterAll)
-            teardown();
+            runExecutable(&teardown, AFTER_ALL, "");
     }
 
-    void Suite::runOne(Testable *testable)
+    void Suite::runTestable(Testable *const testable)
     {
         if (testable->skipped(focusedMode))
             return;
 
         auto prev = context->updateCurrent(testable);
 
-        cout << testable->description << endl;
-
         for (auto setup : beforeEach)
-            setup();
+            runExecutable(&setup, BEFORE_EACH, "");
 
-        testable->test();
+        runExecutable(testable, TEST, testable->description);
 
         for (auto teardown : afterEach)
-            teardown();
+            runExecutable(&teardown, AFTER_EACH, "");
 
-        testable->evaluate();
         context->updateCurrent(prev);
+    }
+
+    void Suite::runExecutable(Executable *const executable,
+        const Target target, const string &description)
+    {
+        try {
+            context->process(Event(executable->location, target, START,
+                description));
+            executable->execute();
+            context->process(Event(executable->location, target, STOP,
+                description));
+        } catch (exception &ex) {
+            context->process(Event(executable->location, target, ABORT,
+                ex.what()));
+
+            throw ex;
+        }
     }
 }

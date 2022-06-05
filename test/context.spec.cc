@@ -1,11 +1,14 @@
 #include "altea.hh"
+#include "default-event-processor.hh"
 
 using namespace altea;
 using namespace std;
 
+static DefaultEventProcessor ep;
+
 static auto _ = describe("Context", [] {
     it("should do nothing when no suites", [] {
-        Context context;
+        Context context(&ep);
 
         context.run();
 
@@ -13,7 +16,7 @@ static auto _ = describe("Context", [] {
     });
 
     it("should do nothing when it has empty NORMAL suites", [] {
-        Context context;
+        Context context(&ep);
 
         context.addSuite(__FILE__, __LINE__, NORMAL, "one", [] {});
         context.addSuite(__FILE__, __LINE__, NORMAL, "two", [] {});
@@ -23,7 +26,7 @@ static auto _ = describe("Context", [] {
     });
 
     it("should run NORMAL tests when defined in NORMAL suites", [] {
-        Context context;
+        Context context(&ep);
         int testCount = 0;
 
         context.addSuite(__FILE__, __LINE__, NORMAL, "one", [&] {

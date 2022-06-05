@@ -1,13 +1,11 @@
-#include <iostream>
-
 #include "context.hh"
-#include "syntax-exception.hh"
 
-using namespace std;
 using namespace altea;
 
 namespace altea {
-    Context::Context(): root(".", 0, this, NORMAL, "root", nullptr)
+    Context::Context(EventProcessor *eventProcessor):
+        root(Location(".", 0), this, NORMAL, "root", nullptr),
+        eventProcessor(eventProcessor)
     {
         current = &root;
     }
@@ -20,10 +18,5 @@ namespace altea {
     {
         discovery = false;
         root.rootRun();
-    }
-
-    void Context::log(const std::string &message)
-    {
-        cout << message << endl;
     }
 }

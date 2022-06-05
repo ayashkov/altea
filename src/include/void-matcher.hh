@@ -8,7 +8,7 @@
 namespace altea {
     class VoidMatcher: public BaseMatcher {
     public:
-        VoidMatcher(const std::string &file, int line, Test *test);
+        VoidMatcher(const Location &location, Test *const test);
 
         void nothing();
 

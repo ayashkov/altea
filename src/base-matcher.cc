@@ -3,8 +3,8 @@
 using namespace std;
 
 namespace altea {
-    BaseMatcher::BaseMatcher(const string &file, int line, Test *test):
-        file(file), line(line), test(test)
+    BaseMatcher::BaseMatcher(const Location &location, Test *const test):
+        location(location), test(test)
     {
     }
 }

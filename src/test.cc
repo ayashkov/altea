@@ -7,70 +7,62 @@
 using namespace std;
 
 namespace altea {
-    Test::Test(const string &file, int line, Context *context, Mode mode,
-        const string &description, std::function<void (void)> test):
-        Testable(file, line, context, mode, description, test)
+    Test::Test(const Location &location, Context *const context,
+        const Mode mode, const string &description,
+        function<void (void)> test):
+        Testable(location, context, mode, description, test)
     {
     }
 
-    void Test::addBeforeAll(const string &file, int line,
-        std::function<void (void)> setup)
+    void Test::addBeforeAll(const Location &location,
+        function<void (void)> setup)
     {
-        throw SyntaxException(file, line,
+        throw SyntaxException(location,
             "a test case cannot contain beforeAll()");
     }
 
-    void Test::addBeforeEach(const string &file, int line,
-        std::function<void (void)> setup)
+    void Test::addBeforeEach(const Location &location,
+        function<void (void)> setup)
     {
-        throw SyntaxException(file, line,
+        throw SyntaxException(location,
             "a test case cannot contain beforeEach()");
     }
 
-    void Test::addAfterAll(const string &file, int line,
-        std::function<void (void)> teardown)
+    void Test::addAfterAll(const Location &location,
+        function<void (void)> teardown)
     {
-        throw SyntaxException(file, line,
+        throw SyntaxException(location,
             "a test case cannot contain afterAll()");
     }
 
-    void Test::addAfterEach(const string &file, int line,
-        std::function<void (void)> teardown)
+    void Test::addAfterEach(const Location &location,
+        function<void (void)> teardown)
     {
-        throw SyntaxException(file, line,
+        throw SyntaxException(location,
             "a test case cannot contain afterEach()");
     }
 
-    void Test::addSuite(const string &file, int line, Mode mode,
-        const string &description, std::function<void (void)> suite)
+    void Test::addSuite(const Location &location, const Mode mode,
+        const string &description, function<void (void)> suite)
     {
-        throw SyntaxException(file, line,
+        throw SyntaxException(location,
             "a test case cannot contain describe(), fdescribe(), xdescribe()");
     }
 
-    void Test::addTest(const string &file, int line, Mode mode,
-        const string &description, std::function<void (void)> test)
+    void Test::addTest(const Location &location, const Mode mode,
+        const string &description, function<void (void)> test)
     {
-        throw SyntaxException(file, line,
+        throw SyntaxException(location,
             "a test case cannot contain it(), fit(), xit()");
     }
 
-    VoidMatcher Test::doExpect(const string &file, int line)
+    VoidMatcher Test::doExpect(const Location &location)
     {
-        return VoidMatcher(file, line, this);
+        return VoidMatcher(location, this);
     }
 
-    BoolMatcher Test::doExpect(const string &file, int line, bool value)
+    BoolMatcher Test::doExpect(const Location &location, const bool value)
     {
-        return BoolMatcher(file, line, this, value);
-    }
-
-    void Test::evaluate() const
-    {
-        if (expectCount == 0)
-            context->log(SourceMessage(file, line, "Warning",
-                "test case '" + description + "' defines no expectations"));
-
-        Testable::evaluate();
+        return BoolMatcher(location, this, value);
     }
 }

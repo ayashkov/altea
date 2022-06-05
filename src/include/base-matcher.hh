@@ -3,17 +3,17 @@
 
 #include <string>
 
+#include "location.hh"
+
 namespace altea {
     class Test;
 
     class BaseMatcher {
     public:
-        BaseMatcher(const std::string &file, int line, Test *test);
+        BaseMatcher(const Location &location, Test *const test);
 
     protected:
-        const std::string file;
-
-        const int line;
+        const Location location;
 
         Test *const test;
     };

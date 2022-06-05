@@ -4,8 +4,8 @@
 using namespace std;
 
 namespace altea {
-    VoidMatcher::VoidMatcher(const string &file, int line, Test *test):
-        BaseMatcher(file, line, test)
+    VoidMatcher::VoidMatcher(const Location &location, Test *const test):
+        BaseMatcher(location, test)
     {
     }
 
@@ -17,6 +17,6 @@ namespace altea {
     void VoidMatcher::toFail(const string &message)
     {
         test->recordExpect();
-        test->recordFailure(file, line, message);
+        test->recordFailure(location, message);
     }
 }

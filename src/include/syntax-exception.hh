@@ -11,9 +11,9 @@ namespace altea {
     public:
         const std::string message;
 
-        SyntaxException(const std::string &file, int line,
+        SyntaxException(const Location &location,
             const std::string &message): std::exception(),
-            message(SourceMessage(file, line, "Syntax error", message))
+            message(SourceMessage(location, "Syntax error", message))
         {
         }
 
