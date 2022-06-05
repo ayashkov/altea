@@ -1,23 +1,24 @@
+#include <algorithm>
+#include <iostream>
+
 #include "altea.hh"
-#include "default-event-processor.hh"
+#include "test-event-processor.hh"
 
 using namespace altea;
 using namespace std;
 
 static auto _ = describe("Context", [] {
-    DefaultEventProcessor *ep;
+    TestEventProcessor *ep;
     Context *context;
 
     beforeEach([&] {
-        ep = new DefaultEventProcessor();
+        ep = new TestEventProcessor();
         context = new Context();
     });
 
     afterEach([&] {
         delete context;
-        context = nullptr;
         delete ep;
-        ep = nullptr;
     });
 
     it("should do nothing when no suites", [&] {
