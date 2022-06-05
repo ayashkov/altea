@@ -11,13 +11,13 @@ using namespace altea;
 namespace altea {
     static DefaultEventProcessor eventProcessor;
 
-    Context __context__(&eventProcessor);
+    Context __context__;
 }
 
 int main(int argc, char *argv[])
 {
     try {
-        __context__.run();
+        __context__.run(&eventProcessor);
 
         return __context__.isFailed() ? 1 : 0;
     } catch (const SyntaxException &ex) {

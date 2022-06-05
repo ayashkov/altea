@@ -12,7 +12,7 @@
 namespace altea {
     class Context {
     public:
-        Context(EventProcessor *eventProcessor);
+        Context();
 
         ~Context();
 
@@ -27,7 +27,7 @@ namespace altea {
 
         inline bool isDiscovery() const
         {
-            return discovery;
+            return eventProcessor == nullptr;
         }
 
         inline bool isFailed() const
@@ -96,16 +96,14 @@ namespace altea {
             eventProcessor->process(event);
         }
 
-        void run();
+        void run(EventProcessor *const ep);
 
     private:
         Suite root;
 
         Testable *current;
 
-        EventProcessor *eventProcessor;
-
-        bool discovery = true;
+        EventProcessor *eventProcessor = nullptr;
 
         bool failed = false;
     };

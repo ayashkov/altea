@@ -3,9 +3,8 @@
 using namespace altea;
 
 namespace altea {
-    Context::Context(EventProcessor *eventProcessor):
-        root(Location(".", 0), this, NORMAL, "root", nullptr),
-        eventProcessor(eventProcessor)
+    Context::Context():
+        root(Location(".", 0), this, NORMAL, "root", nullptr)
     {
         current = &root;
     }
@@ -14,9 +13,9 @@ namespace altea {
     {
     }
 
-    void Context::run()
+    void Context::run(EventProcessor *const ep)
     {
-        discovery = false;
+        eventProcessor = ep;
         root.rootRun();
     }
 }
