@@ -31,6 +31,12 @@ namespace altea {
         throw SyntaxException(location, "only a test can contain expect()");
     }
 
+    LongMatcher Testable::doExpect(const Location &location,
+        const long value)
+    {
+        throw SyntaxException(location, "only a test can contain expect()");
+    }
+
     void Testable::recordExpect()
     {
         ++expectCount;

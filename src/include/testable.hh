@@ -8,6 +8,7 @@
 #include "executable.hh"
 #include "void-matcher.hh"
 #include "bool-matcher.hh"
+#include "long-matcher.hh"
 #include "source-message.hh"
 
 namespace altea {
@@ -54,6 +55,9 @@ namespace altea {
 
         virtual BoolMatcher doExpect(const Location &location,
             const bool value);
+
+        virtual LongMatcher doExpect(const Location &location,
+            const long value);
 
     protected:
         Mode mode;

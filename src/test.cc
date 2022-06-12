@@ -65,4 +65,10 @@ namespace altea {
     {
         return BoolMatcher(location, this, value);
     }
+
+    LongMatcher Test::doExpect(const Location &location,
+        const long value)
+    {
+        return LongMatcher(location, this, value);
+    }
 }

@@ -14,6 +14,7 @@ namespace altea {
         void toBeTrue();
 
         void toBeFalse();
+
     private:
         const bool value;
     };

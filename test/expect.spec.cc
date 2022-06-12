@@ -39,7 +39,7 @@ static auto _ = describe("Expect", [] {
         expect(context->isFailed()).toBeTrue();
     });
 
-    it("should succeed when #isTrue() is called for true", [&] {
+    it("should succeed when #toBeTrue() is called for true", [&] {
         context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
             context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
                 context->doExpect(__FILE__, __LINE__, true).toBeTrue();
@@ -50,7 +50,7 @@ static auto _ = describe("Expect", [] {
         expect(context->isFailed()).toBeFalse();
     });
 
-    it("should fail when #isTrue() is called for false", [&] {
+    it("should fail when #toBeTrue() is called for false", [&] {
         context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
             context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
                 context->doExpect(__FILE__, __LINE__, false).toBeTrue();
@@ -61,7 +61,7 @@ static auto _ = describe("Expect", [] {
         expect(context->isFailed()).toBeTrue();
     });
 
-    it("should succeed when #isFalse() is called for false", [&] {
+    it("should succeed when #toBeFalse() is called for false", [&] {
         context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
             context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
                 context->doExpect(__FILE__, __LINE__, false).toBeFalse();
@@ -72,10 +72,68 @@ static auto _ = describe("Expect", [] {
         expect(context->isFailed()).toBeFalse();
     });
 
-    it("should fail when #isFalse() is called for true", [&] {
+    it("should fail when #toBeFalse() is called for true", [&] {
         context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
             context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
                 context->doExpect(__FILE__, __LINE__, true).toBeFalse();
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
+    it("should succeed when #toBe(N) is called for the same number N", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 42L).toBe(42);
+                context->doExpect(__FILE__, __LINE__, -42).toBe(-42);
+                context->doExpect(__FILE__, __LINE__, (short)42).toBe(42);
+                context->doExpect(__FILE__, __LINE__, (char)42).toBe(42);
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+    });
+
+    it("should fail when #toBe(N) is called for a different long N", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 42L).toBe(43);
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
+    it("should fail when #toBe(N) is called for a different int N", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 42).toBe(43);
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
+    it("should fail when #toBe(N) is called for a different short N", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, (short)42).toBe(43);
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
+    it("should fail when #toBe(N) is called for a different char N", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, (char)42).toBe(43);
             });
         });
         context->run(ep);

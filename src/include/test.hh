@@ -7,6 +7,7 @@
 #include "testable.hh"
 #include "void-matcher.hh"
 #include "bool-matcher.hh"
+#include "long-matcher.hh"
 
 namespace altea {
     class Test: public Testable {
@@ -39,6 +40,9 @@ namespace altea {
 
         virtual BoolMatcher doExpect(const Location &location,
             const bool value);
+
+        virtual LongMatcher doExpect(const Location &location,
+            const long value);
     };
 }
 

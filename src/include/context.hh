@@ -8,6 +8,9 @@
 #include "testable.hh"
 #include "suite.hh"
 #include "event-processor.hh"
+#include "void-matcher.hh"
+#include "bool-matcher.hh"
+#include "long-matcher.hh"
 
 namespace altea {
     class Context {
@@ -89,6 +92,30 @@ namespace altea {
             const int line, const bool value)
         {
             return current->doExpect(Location(file, line), value);
+        }
+
+        inline LongMatcher doExpect(const std::string &file,
+            const int line, const long value)
+        {
+            return current->doExpect(Location(file, line), value);
+        }
+
+        inline LongMatcher doExpect(const std::string &file,
+            const int line, const int value)
+        {
+            return current->doExpect(Location(file, line), (long)value);
+        }
+
+        inline LongMatcher doExpect(const std::string &file,
+            const int line, const short value)
+        {
+            return current->doExpect(Location(file, line), (long)value);
+        }
+
+        inline LongMatcher doExpect(const std::string &file,
+            const int line, const char value)
+        {
+            return current->doExpect(Location(file, line), (long)value);
         }
 
         inline void process(const Event &event)
