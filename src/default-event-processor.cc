@@ -7,25 +7,22 @@ using namespace std;
 namespace altea {
     void DefaultEventProcessor::process(const Event &event)
     {
-        switch (event.action) {
-        case START:
-            if (event.target == SUITE || event.target == TEST)
-                log(event.message);
+        if (event.target == TEST || event.target == SUITE)
+            processContainer(event);
+        else if (event.target == EXPECTATION)
+            log(event.message + " " + (string)event.location);
+    }
 
+    void DefaultEventProcessor::processContainer(const Event &event)
+    {
+        if (event.action == START) {
+            log(event.message);
             ++level;
-
-            break;
-        case FAIL:
-        case ABORT:
-            if (event.target == TEST)
-                successful = false;
-            else if (event.target == EXPECTATION)
-                log(event.message + " " + (string)event.location);
-        case STOP:
+        } else if (event.action == STOP || event.action == FAIL ||
+            event.action == ABORT)
             --level;
-
-            break;
-        }
+        else if (event.action == SKIP)
+            log("SKIPPED: " + event.message);
     }
 
     void DefaultEventProcessor::log(const string &message)

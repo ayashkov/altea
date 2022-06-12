@@ -12,6 +12,8 @@ namespace altea {
     private:
         int level = 0;
 
+        void processContainer(const Event &event);
+
         void log(const std::string &message);
     };
 }

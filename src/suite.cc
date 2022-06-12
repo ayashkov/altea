@@ -143,8 +143,12 @@ namespace altea {
 
     void Suite::runTestable(Testable *const testable)
     {
-        if (testable->skipped(focusedMode))
+        if (testable->skipped(focusedMode)) {
+            context->process(Event(testable->location, TEST, SKIP,
+            testable->description));
+
             return;
+        }
 
         auto prev = context->updateCurrent(testable);
 

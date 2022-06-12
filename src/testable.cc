@@ -39,7 +39,7 @@ namespace altea {
     void Testable::recordFailure(const Location &location,
         const string &message)
     {
-        // failures.push_back(SourceMessage(location, "Failure", message));
+        context->process(Event(location, EXPECTATION, FAIL, message));
         context->markFailed();
     }
 }
