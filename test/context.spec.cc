@@ -36,8 +36,8 @@ static auto _ = describe("Context", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(one == 2).toBeTrue();
-        expect(two == 2).toBeTrue();
+        expect(one).toBe(2);
+        expect(two).toBe(2);
     });
 
     it("should run lambdas once in NORMAL tests in NORMAL suites", [&] {
@@ -61,9 +61,9 @@ static auto _ = describe("Context", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(oneOfOne == 1).toBeTrue();
-        expect(twoOfOne == 1).toBeTrue();
-        expect(oneOfTwo == 1).toBeTrue();
+        expect(oneOfOne).toBe(1);
+        expect(twoOfOne).toBe(1);
+        expect(oneOfTwo).toBe(1);
     });
 
     it("should run NORMAL tests in nested NORMAL suites", [&] {
@@ -81,6 +81,6 @@ static auto _ = describe("Context", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(nested == 1).toBeTrue();
+        expect(nested).toBe(1);
     });
 });
