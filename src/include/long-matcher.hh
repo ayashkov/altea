@@ -13,8 +13,21 @@ namespace altea {
 
         void toBe(const long expected);
 
+        void toBeTruthy();
+
+        void toBeFalsy();
+
+        virtual LongMatcher NOT();
+
     private:
         const long value;
+
+        const bool negated;
+
+        LongMatcher(const Location &location, Test *const test,
+            const long value, const bool negated);
+
+        std::string describe(const std::string &eval, const long expected);
     };
 }
 

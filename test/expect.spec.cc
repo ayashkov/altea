@@ -141,6 +141,75 @@ static auto _ = describe("Expect", [] {
         expect(context->isFailed()).toBeTrue();
     });
 
+    it("should succeed when #toBeTruthy() is called for not 0", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 12).toBeTruthy();
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+    });
+
+    it("should fail when #toBeTruthy() is called for 0", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 0).toBeTruthy();
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
+    it("should succeed when #toBeFalsy() is called for 0", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 0).toBeFalsy();
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+    });
+
+    it("should fail when #toBeFalsy() is called for not 0", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 3).toBeFalsy();
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
+    it("should succeed when #NOT() negates the false outcome", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 1).NOT().toBe(0);
+                context->doExpect(__FILE__, __LINE__, 0).NOT().toBeTruthy();
+                context->doExpect(__FILE__, __LINE__, 12).NOT().toBeFalsy();
+                context->doExpect(__FILE__, __LINE__, 1).NOT().NOT().toBe(1);
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+    });
+
+    it("should fail when #NOT() negates the true outcome", [&] {
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__, 1).NOT().toBe(1);
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeTrue();
+    });
+
     it("should not abort the test on a failure", [&] {
         bool reached = false;
 
