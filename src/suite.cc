@@ -131,23 +131,30 @@ namespace altea {
 
     void Suite::run()
     {
-        for (auto setup : beforeAll)
-            runExecutable(&setup, BEFORE_ALL, "");
-
         for (auto testable : testables)
             runTestable(testable);
 
-        for (auto teardown : afterAll)
-            runExecutable(&teardown, AFTER_ALL, "");
+        if (beforeAllDone)
+            for (auto teardown : afterAll)
+                runExecutable(&teardown, AFTER_ALL, "");
+
+        beforeAllDone = false;
     }
 
     void Suite::runTestable(Testable *const testable)
     {
         if (testable->skipped(focusedMode)) {
             context->process(Event(testable->location, TEST, SKIP,
-            testable->description));
+                testable->description));
 
             return;
+        }
+
+        if (!beforeAllDone) {
+            for (auto setup : beforeAll)
+                runExecutable(&setup, BEFORE_ALL, "");
+
+            beforeAllDone = true;
         }
 
         auto prev = context->updateCurrent(testable);
@@ -172,7 +179,7 @@ namespace altea {
             executable->execute();
             context->process(Event(executable->location, target, STOP,
                 description));
-        } catch (exception &ex) {
+        } catch (const exception &ex) {
             context->process(Event(executable->location, target, ABORT,
                 ex.what()));
 

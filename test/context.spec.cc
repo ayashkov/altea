@@ -87,66 +87,12 @@ static auto _ = describe("Context", [] {
         expect(nested).toBe(1);
     });
 
-    it("should run beforEach() in order before each test", [&] {
+    it("should run beforEach() in order before each test and suite", [&] {
         string order;
 
         context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addBeforeEach(__FILE__, __LINE__, [&] {
-                order += "1";
-            });
-
-            context->addBeforeEach(__FILE__, __LINE__, [&] {
-                order += "2";
-            });
-
             context->addTest(__FILE__, __LINE__, NORMAL, "one", [&] {
                 order += " ";
-            });
-
-            context->addTest(__FILE__, __LINE__, NORMAL, "two", [&] {
-                order += " ";
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeFalse();
-        expect(order == "12 12 ").toBeTrue();
-    });
-
-    it("should run afterEach() in order after each test", [&] {
-        string order;
-
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addAfterEach(__FILE__, __LINE__, [&] {
-                order += "1";
-            });
-
-            context->addAfterEach(__FILE__, __LINE__, [&] {
-                order += "2";
-            });
-
-            context->addTest(__FILE__, __LINE__, NORMAL, "one", [&] {
-                order += " ";
-            });
-
-            context->addTest(__FILE__, __LINE__, NORMAL, "two", [&] {
-                order += " ";
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeFalse();
-        expect(order == " 12 12").toBeTrue();
-    });
-
-    it("should run beforEach() in order before each suite", [&] {
-        string order;
-
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addSuite(__FILE__, __LINE__, NORMAL, "one", [&] {
-                context->addTest(__FILE__, __LINE__, NORMAL, "child", [&] {
-                    order += " ";
-                });
             });
 
             context->addSuite(__FILE__, __LINE__, NORMAL, "two", [&] {
@@ -169,14 +115,12 @@ static auto _ = describe("Context", [] {
         expect(order == "12 12 ").toBeTrue();
     });
 
-    it("should run afterEach() in order after each suite", [&] {
+    it("should run afterEach() in order after each test and suite", [&] {
         string order;
 
         context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addSuite(__FILE__, __LINE__, NORMAL, "one", [&] {
-                context->addTest(__FILE__, __LINE__, NORMAL, "child", [&] {
-                    order += " ";
-                });
+            context->addTest(__FILE__, __LINE__, NORMAL, "one", [&] {
+                order += " ";
             });
 
             context->addSuite(__FILE__, __LINE__, NORMAL, "two", [&] {
@@ -197,5 +141,95 @@ static auto _ = describe("Context", [] {
 
         expect(context->isFailed()).toBeFalse();
         expect(order == " 12 12").toBeTrue();
+    });
+
+    it("should run beforAll() in order before all beforeEach(), tests and suites", [&] {
+        string order;
+
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addBeforeEach(__FILE__, __LINE__, [&] {
+                order += "3";
+            });
+
+            context->addTest(__FILE__, __LINE__, NORMAL, "one", [&] {
+                order += " ";
+            });
+
+            context->addSuite(__FILE__, __LINE__, NORMAL, "two", [&] {
+                context->addTest(__FILE__, __LINE__, NORMAL, "child", [&] {
+                    order += " ";
+                });
+            });
+
+            context->addBeforeAll(__FILE__, __LINE__, [&] {
+                order += "1";
+            });
+
+            context->addBeforeAll(__FILE__, __LINE__, [&] {
+                order += "2";
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+        expect(order == "123 3 ").toBeTrue();
+    });
+
+    it("should run afterAll() in order after all tests, suites and afterEach()", [&] {
+        string order;
+
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addAfterEach(__FILE__, __LINE__, [&] {
+                order += "1";
+            });
+
+            context->addTest(__FILE__, __LINE__, NORMAL, "one", [&] {
+                order += " ";
+            });
+
+            context->addSuite(__FILE__, __LINE__, NORMAL, "two", [&] {
+                context->addTest(__FILE__, __LINE__, NORMAL, "child", [&] {
+                    order += " ";
+                });
+            });
+
+            context->addAfterAll(__FILE__, __LINE__, [&] {
+                order += "2";
+            });
+
+            context->addAfterAll(__FILE__, __LINE__, [&] {
+                order += "3";
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+        expect(order == " 1 123").toBeTrue();
+    });
+
+    it("should NOT run setup and teardown when suite has no testables", [&] {
+        string order;
+
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addBeforeAll(__FILE__, __LINE__, [&] {
+                order += "1";
+            });
+
+            context->addBeforeEach(__FILE__, __LINE__, [&] {
+                order += "2";
+            });
+
+            context->addAfterEach(__FILE__, __LINE__, [&] {
+                order += "3";
+            });
+
+            context->addAfterAll(__FILE__, __LINE__, [&] {
+                order += "4";
+            });
+        });
+        context->run(ep);
+
+        expect(context->isFailed()).toBeFalse();
+        expect(order == "").toBeTrue();
     });
 });

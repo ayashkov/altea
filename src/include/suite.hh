@@ -50,6 +50,8 @@ namespace altea {
     private:
         bool focusedMode = false;
 
+        bool beforeAllDone = false;
+
         int discovered = 0;
 
         std::queue<Suite*> subSuites;
