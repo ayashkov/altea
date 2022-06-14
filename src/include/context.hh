@@ -67,12 +67,14 @@ namespace altea {
             current->addAfterEach(Location(file, line), teardown);
         }
 
-        inline void addSuite(const std::string &file, const int line,
+        inline int addSuite(const std::string &file, const int line,
             const Mode mode, const std::string &description,
             std::function<void (void)> suite)
         {
             current->addSuite(Location(file, line), mode, description,
                 suite);
+
+            return 0;
         }
 
         inline void addTest(const std::string &file, const int line,

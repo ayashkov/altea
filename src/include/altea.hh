@@ -16,11 +16,11 @@ namespace altea {
 #define afterEach(teardown) (__context__.addAfterEach(__FILE__, \
     __LINE__, (teardown)))
 #define describe(description, suite) (__context__.addSuite(__FILE__, \
-    __LINE__, NORMAL, (description), (suite)), 0)
+    __LINE__, NORMAL, (description), (suite)))
 #define fdescribe(description, suite) (__context__.addSuite(__FILE__, \
-    __LINE__, FOCUSED, (description), (suite)), 0)
+    __LINE__, FOCUSED, (description), (suite)))
 #define xdescribe(description, suite) (__context__.addSuite(__FILE__, \
-    __LINE__, EXCLUDED, (description), (suite)), 0)
+    __LINE__, EXCLUDED, (description), (suite)))
 #define it(description, test) (__context__.addTest(__FILE__, __LINE__, \
     NORMAL, (description), (test)))
 #define fit(description, test) (__context__.addTest(__FILE__, __LINE__, \
