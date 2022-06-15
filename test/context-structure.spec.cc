@@ -6,7 +6,7 @@
 using namespace std;
 using namespace altea;
 
-static auto _ = describe("Context", [] {
+static auto _ = describe("Context structure", [] {
     TestEventProcessor *ep;
     Context *context;
 
@@ -231,5 +231,22 @@ static auto _ = describe("Context", [] {
 
         expect(context->isFailed()).toBeFalse();
         expect(order == "").toBeTrue();
+    });
+
+    it("should NOT abort the test on a failure", [&] {
+        bool reached = false;
+
+        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
+            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
+                context->doExpect(__FILE__, __LINE__).toFail("fail");
+                context->doExpect(__FILE__, __LINE__, true).toBeFalse();
+                context->doExpect(__FILE__, __LINE__, false).toBeTrue();
+
+                reached = true;
+            });
+        });
+        context->run(ep);
+
+        expect(reached).toBeTrue();
     });
 });

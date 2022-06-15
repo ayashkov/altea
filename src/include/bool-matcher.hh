@@ -11,12 +11,23 @@ namespace altea {
         BoolMatcher(const Location &location, Test *const test,
             const bool value);
 
+        void toBe(const bool expected);
+
         void toBeTrue();
 
         void toBeFalse();
 
+        BoolMatcher NOT();
+
     private:
         const bool value;
+
+        const bool negated;
+
+        BoolMatcher(const Location &location, Test *const test,
+            const bool value, const bool negated);
+
+        std::string describe(const std::string &eval, const bool expected);
     };
 }
 

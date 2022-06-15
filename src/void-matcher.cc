@@ -1,5 +1,4 @@
 #include "void-matcher.hh"
-#include "test.hh"
 
 using namespace std;
 
@@ -11,12 +10,12 @@ namespace altea {
 
     void VoidMatcher::nothing()
     {
-        test->recordExpect();
+        recordExpect();
     }
 
     void VoidMatcher::toFail(const string &message)
     {
-        test->recordExpect();
-        test->recordFailure(location, message);
+        recordExpect();
+        recordFailure(message);
     }
 }

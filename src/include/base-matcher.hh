@@ -16,6 +16,10 @@ namespace altea {
         const Location location;
 
         Test *const test;
+
+        void recordExpect();
+
+        void recordFailure(const std::string &message);
     };
 }
 

@@ -1,7 +1,6 @@
 #include <string>
 
 #include "long-matcher.hh"
-#include "test.hh"
 
 using namespace std;
 
@@ -19,10 +18,10 @@ namespace altea {
 
     void LongMatcher::toBe(const long expected)
     {
-        test->recordExpect();
+        recordExpect();
 
         if ((value == expected) == negated)
-            test->recordFailure(location, describe("to be", expected));
+            recordFailure(describe("to be", expected));
     }
 
     void LongMatcher::toBeTruthy()

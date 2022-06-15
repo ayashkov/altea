@@ -1,29 +1,52 @@
 #include "bool-matcher.hh"
-#include "test.hh"
 
 using namespace std;
 
 namespace altea {
     BoolMatcher::BoolMatcher(const Location &location, Test *const test,
-        const bool value): BaseMatcher(location, test), value(value)
+        const bool value): BoolMatcher(location, test, value, false)
     {
+    }
+
+    BoolMatcher::BoolMatcher(const Location &location, Test *const test,
+        const bool value, const bool negated): BaseMatcher(location, test),
+        value(value), negated(negated)
+    {
+    }
+
+    void BoolMatcher::toBe(const bool expected)
+    {
+        recordExpect();
+
+        if ((value == expected) == negated)
+            recordFailure(describe("to be", expected));
     }
 
     void BoolMatcher::toBeTrue()
     {
-        test->recordExpect();
-
-        if (!value)
-            test->recordFailure(location, "expected the value to be "
-                "true but was false");
+        toBe(true);
     }
 
     void BoolMatcher::toBeFalse()
     {
-        test->recordExpect();
+        toBe(false);
+    }
 
-        if (value)
-            test->recordFailure(location, "expected the value to be "
-                "false but was true");
+    BoolMatcher BoolMatcher::NOT()
+    {
+        return BoolMatcher(location, test, value, !negated);
+    }
+
+    string BoolMatcher::describe(const string &eval, const bool expected)
+    {
+        string d = "expected the value ";
+
+        if (negated)
+            d += "NOT ";
+
+        d += eval + " " + to_string(expected) + ", but it was " +
+            to_string(value);
+
+        return d;
     }
 }

@@ -17,7 +17,7 @@ namespace altea {
 
         void toBeFalsy();
 
-        virtual LongMatcher NOT();
+        LongMatcher NOT();
 
     private:
         const long value;

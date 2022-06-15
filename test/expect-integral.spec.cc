@@ -3,7 +3,7 @@
 
 using namespace altea;
 
-static auto _ = describe("Expect", [] {
+static auto _ = describe("Expect with integral type argument", [] {
     TestEventProcessor *ep;
     Context *context;
 
@@ -15,72 +15,6 @@ static auto _ = describe("Expect", [] {
     afterEach([&] {
         delete context;
         delete ep;
-    });
-
-    it("should succeed when #nothing() is called", [&] {
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__).nothing();
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeFalse();
-    });
-
-    it("should fail when #toFail() is called", [&] {
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__).toFail("bang!");
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeTrue();
-    });
-
-    it("should succeed when #toBeTrue() is called for true", [&] {
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__, true).toBeTrue();
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeFalse();
-    });
-
-    it("should fail when #toBeTrue() is called for false", [&] {
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__, false).toBeTrue();
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeTrue();
-    });
-
-    it("should succeed when #toBeFalse() is called for false", [&] {
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__, false).toBeFalse();
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeFalse();
-    });
-
-    it("should fail when #toBeFalse() is called for true", [&] {
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__, true).toBeFalse();
-            });
-        });
-        context->run(ep);
-
-        expect(context->isFailed()).toBeTrue();
     });
 
     it("should succeed when #toBe(N) is called for the same number N", [&] {
@@ -208,22 +142,5 @@ static auto _ = describe("Expect", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeTrue();
-    });
-
-    it("should not abort the test on a failure", [&] {
-        bool reached = false;
-
-        context->addSuite(__FILE__, __LINE__, NORMAL, "suite", [&] {
-            context->addTest(__FILE__, __LINE__, NORMAL, "test", [&] {
-                context->doExpect(__FILE__, __LINE__).toFail("fail");
-                context->doExpect(__FILE__, __LINE__, true).toBeFalse();
-                context->doExpect(__FILE__, __LINE__, false).toBeTrue();
-
-                reached = true;
-            });
-        });
-        context->run(ep);
-
-        expect(reached).toBeTrue();
     });
 });
