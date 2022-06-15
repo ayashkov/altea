@@ -112,7 +112,7 @@ static auto _ = describe("Context structure", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(order == "12 12 ").toBeTrue();
+        expect(order).toBe("12 12 ");
     });
 
     it("should run afterEach() in order after each test and suite", [&] {
@@ -140,7 +140,7 @@ static auto _ = describe("Context structure", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(order == " 12 12").toBeTrue();
+        expect(order).toBe(" 12 12");
     });
 
     it("should run beforAll() in order before all beforeEach(), tests and suites", [&] {
@@ -172,7 +172,7 @@ static auto _ = describe("Context structure", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(order == "123 3 ").toBeTrue();
+        expect(order).toBe("123 3 ");
     });
 
     it("should run afterAll() in order after all tests, suites and afterEach()", [&] {
@@ -204,7 +204,7 @@ static auto _ = describe("Context structure", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(order == " 1 123").toBeTrue();
+        expect(order).toBe(" 1 123");
     });
 
     it("should NOT run setup and teardown when suite has no testables", [&] {
@@ -230,7 +230,7 @@ static auto _ = describe("Context structure", [] {
         context->run(ep);
 
         expect(context->isFailed()).toBeFalse();
-        expect(order == "").toBeTrue();
+        expect(order).toBe("");
     });
 
     it("should NOT abort the test on a failure", [&] {
