@@ -53,8 +53,8 @@ namespace altea {
             if (negated)
                 descr += "NOT ";
 
-            descr += eval + " " + toString(expected) +
-                ", but it was " + toString(value);
+            descr += eval + " <" + toString(expected) +
+                ">, but it was <" + toString(value) + ">";
 
             return descr;
         }
