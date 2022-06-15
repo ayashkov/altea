@@ -43,6 +43,9 @@ namespace altea {
 
         virtual LongMatcher doExpect(const Location &location,
             const long value);
+
+        virtual StringMatcher doExpect(const Location &location,
+            const std::string &value);
     };
 }
 

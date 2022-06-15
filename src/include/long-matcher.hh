@@ -1,22 +1,31 @@
 #ifndef __LONG_MATCHER_HH
 #define __LONG_MATCHER_HH
 
-#include <string>
-
 #include "value-matcher.hh"
 
 namespace altea {
     class LongMatcher: public ValueMatcher<LongMatcher, long> {
     public:
         LongMatcher(const Location &location, Test *const test,
-            const long value);
+            const long value): LongMatcher(location, test, false, value)
+        {
+        }
 
         LongMatcher(const Location &location, Test *const test,
-            const bool negated, const long value);
+            const bool negated, const long value):
+            ValueMatcher(location, test, negated, value)
+        {
+        }
 
-        void toBeTruthy();
+        inline void toBeTruthy()
+        {
+            NOT().toBeFalsy();
+        }
 
-        void toBeFalsy();
+        inline void toBeFalsy()
+        {
+            toBe(0);
+        }
     };
 }
 

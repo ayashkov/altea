@@ -9,6 +9,7 @@
 #include "void-matcher.hh"
 #include "bool-matcher.hh"
 #include "long-matcher.hh"
+#include "string-matcher.hh"
 #include "source-message.hh"
 
 namespace altea {
@@ -58,6 +59,9 @@ namespace altea {
 
         virtual LongMatcher doExpect(const Location &location,
             const long value);
+
+        virtual StringMatcher doExpect(const Location &location,
+            const std::string &value);
 
     protected:
         Mode mode;

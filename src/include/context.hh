@@ -9,6 +9,7 @@
 #include "suite.hh"
 #include "event-processor.hh"
 #include "void-matcher.hh"
+#include "string-matcher.hh"
 #include "bool-matcher.hh"
 #include "long-matcher.hh"
 
@@ -88,6 +89,19 @@ namespace altea {
             const int line)
         {
             return current->doExpect(Location(file, line));
+        }
+
+        inline StringMatcher doExpect(const std::string &file,
+            const int line, const char *value)
+        {
+            return current->doExpect(Location(file, line),
+                (std::string)value);
+        }
+
+        inline StringMatcher doExpect(const std::string &file,
+            const int line, const std::string &value)
+        {
+            return current->doExpect(Location(file, line), value);
         }
 
         inline BoolMatcher doExpect(const std::string &file,

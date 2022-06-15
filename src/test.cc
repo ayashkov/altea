@@ -1,7 +1,6 @@
 #include <iostream>
 
 #include "test.hh"
-#include "context.hh"
 #include "syntax-exception.hh"
 
 using namespace std;
@@ -70,5 +69,11 @@ namespace altea {
         const long value)
     {
         return LongMatcher(location, this, value);
+    }
+
+    StringMatcher Test::doExpect(const Location &location,
+        const string &value)
+    {
+        return StringMatcher(location, this, value);
     }
 }

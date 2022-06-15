@@ -6,6 +6,18 @@
 #include "base-matcher.hh"
 
 namespace altea {
+    template <typename T>
+    inline std::string toString(const T &value)
+    {
+        return std::to_string(value);
+    }
+
+    template <>
+    inline std::string toString(const std::string &value)
+    {
+        return value;
+    }
+
     template <typename M, typename T>
     class ValueMatcher: public BaseMatcher {
     public:
@@ -41,8 +53,8 @@ namespace altea {
             if (negated)
                 descr += "NOT ";
 
-            descr += eval + " " + std::to_string(expected) +
-                ", but it was " + std::to_string(value);
+            descr += eval + " " + toString(expected) +
+                ", but it was " + toString(value);
 
             return descr;
         }
