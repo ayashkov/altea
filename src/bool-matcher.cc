@@ -4,22 +4,14 @@ using namespace std;
 
 namespace altea {
     BoolMatcher::BoolMatcher(const Location &location, Test *const test,
-        const bool value): BoolMatcher(location, test, value, false)
+        const bool value): BoolMatcher(location, test, false, value)
     {
     }
 
     BoolMatcher::BoolMatcher(const Location &location, Test *const test,
-        const bool value, const bool negated): BaseMatcher(location, test),
-        value(value), negated(negated)
+        const bool negated, const bool value):
+        ValueMatcher(location, test, negated, value)
     {
-    }
-
-    void BoolMatcher::toBe(const bool expected)
-    {
-        recordExpect();
-
-        if ((value == expected) == negated)
-            recordFailure(describe("to be", expected));
     }
 
     void BoolMatcher::toBeTrue()
@@ -30,23 +22,5 @@ namespace altea {
     void BoolMatcher::toBeFalse()
     {
         toBe(false);
-    }
-
-    BoolMatcher BoolMatcher::NOT()
-    {
-        return BoolMatcher(location, test, value, !negated);
-    }
-
-    string BoolMatcher::describe(const string &eval, const bool expected)
-    {
-        string d = "expected the value ";
-
-        if (negated)
-            d += "NOT ";
-
-        d += eval + " " + to_string(expected) + ", but it was " +
-            to_string(value);
-
-        return d;
     }
 }

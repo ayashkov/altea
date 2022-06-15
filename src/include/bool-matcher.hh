@@ -3,31 +3,20 @@
 
 #include <string>
 
-#include "base-matcher.hh"
+#include "value-matcher.hh"
 
 namespace altea {
-    class BoolMatcher: public BaseMatcher {
+    class BoolMatcher: public ValueMatcher<BoolMatcher, bool> {
     public:
         BoolMatcher(const Location &location, Test *const test,
             const bool value);
 
-        void toBe(const bool expected);
+        BoolMatcher(const Location &location, Test *const test,
+            const bool negated, const bool value);
 
         void toBeTrue();
 
         void toBeFalse();
-
-        BoolMatcher NOT();
-
-    private:
-        const bool value;
-
-        const bool negated;
-
-        BoolMatcher(const Location &location, Test *const test,
-            const bool value, const bool negated);
-
-        std::string describe(const std::string &eval, const bool expected);
     };
 }
 

@@ -3,31 +3,20 @@
 
 #include <string>
 
-#include "base-matcher.hh"
+#include "value-matcher.hh"
 
 namespace altea {
-    class LongMatcher: public BaseMatcher {
+    class LongMatcher: public ValueMatcher<LongMatcher, long> {
     public:
         LongMatcher(const Location &location, Test *const test,
             const long value);
 
-        void toBe(const long expected);
+        LongMatcher(const Location &location, Test *const test,
+            const bool negated, const long value);
 
         void toBeTruthy();
 
         void toBeFalsy();
-
-        LongMatcher NOT();
-
-    private:
-        const long value;
-
-        const bool negated;
-
-        LongMatcher(const Location &location, Test *const test,
-            const long value, const bool negated);
-
-        std::string describe(const std::string &eval, const long expected);
     };
 }
 
